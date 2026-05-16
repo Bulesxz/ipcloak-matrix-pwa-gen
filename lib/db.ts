@@ -27,6 +27,13 @@ export interface PixelConfig {
 export type AppTemplate = 'classic' | 'playstore' | 'floating';
 export type AppLanguage = 'zh' | 'en';
 export type AppDistribution = 'pwa' | 'apk';
+/**
+ * 安装按钮配色 (classic + floating 模板生效, playstore 永远是 Google Play 深绿不可改)
+ * - rainbow: 7 色渐变动画 (默认)
+ * - blue/green/orange/red/black/purple: 纯色预设
+ * - custom: 用户自填 hex (读 customButtonColor 字段)
+ */
+export type ButtonColor = 'rainbow' | 'blue' | 'green' | 'orange' | 'red' | 'black' | 'purple' | 'custom';
 
 export interface AppReviews {
   /** 平均评分 (0-5), 可选填 */
@@ -62,6 +69,10 @@ export interface AppConfig {
   distribution?: AppDistribution;
   /** ⭐ APK 下载 URL (distribution=apk 时必填) */
   apkUrl?: string;
+  /** ⭐ 按钮颜色 (classic + floating + apk-button 通用, playstore 不受影响) */
+  buttonColor?: ButtonColor;
+  /** ⭐ 自定义按钮 hex (buttonColor=custom 时生效, 如 #ff6b6b) */
+  customButtonColor?: string;
   /** 创建时间 (ISO string, 跟旧版本兼容) */
   createdAt?: string;
 }

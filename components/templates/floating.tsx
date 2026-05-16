@@ -10,14 +10,16 @@
  */
 import InstallPrompt from '@/components/install-prompt';
 import ApkButton from '@/components/apk-button';
+import { buttonStyle } from '@/lib/button-style';
 import type { AppConfig } from '@/lib/db';
 
 export default function FloatingTemplate({ app }: { app: AppConfig }) {
     const lang = app.language || 'zh';
     const bg = app.backgroundColor || '#ffffff';
     const isDark = bg === '#000000' || bg === '#000' || bg.toLowerCase() === '#0a0a0a';
-    const buttonShadowText = isDark ? 'text-black' : 'text-white';
     const heroImage = app.heroImage?.trim();
+    const bs = buttonStyle(app.buttonColor, app.customButtonColor);
+    const btnCls = `${bs.className} w-full h-14 text-lg rounded-2xl font-bold shadow-[0_8px_30px_rgba(0,0,0,0.25)] flex items-center justify-center gap-2`;
 
     return (
         <div className="min-h-screen w-full relative overflow-hidden" style={{ backgroundColor: bg }}>
@@ -63,13 +65,15 @@ export default function FloatingTemplate({ app }: { app: AppConfig }) {
                             apkUrl={app.apkUrl}
                             lang={lang}
                             customLabel={app.installLabel}
-                            buttonClassName="rainbow-button w-full h-14 text-lg rounded-2xl font-bold flex items-center justify-center gap-2"
+                            buttonClassName={btnCls}
+                            buttonStyle={bs.style}
                         />
                     ) : (
                         <InstallPrompt
                             lang={lang}
                             customLabel={app.installLabel}
-                            buttonClassName="rainbow-button w-full h-14 text-lg rounded-2xl font-bold flex items-center justify-center gap-2"
+                            buttonClassName={btnCls}
+                            buttonStyle={bs.style}
                             installedClassName="w-full h-14 rounded-2xl bg-green-500/30 text-green-100 font-bold flex items-center justify-center gap-2 backdrop-blur-sm border border-green-400/30"
                         />
                     )}

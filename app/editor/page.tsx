@@ -8,9 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Save, Smartphone, Activity, Star, Image as ImageIcon, Sparkles, Languages, X, Package } from 'lucide-react';
+import { ArrowLeft, Save, Smartphone, Activity, Star, Image as ImageIcon, Sparkles, Languages, X, Package, Palette } from 'lucide-react';
 import { dict, type Dict } from '@/lib/i18n';
 import UploadButton from '@/components/upload-button';
+import { BUTTON_COLOR_OPTIONS, buttonStyle } from '@/lib/button-style';
+import type { ButtonColor } from '@/lib/db';
 
 const STORAGE_KEY = 'pwa-gen-lang';
 
@@ -49,6 +51,8 @@ interface AppConfig {
     heroImage?: string;
     distribution?: Distribution;
     apkUrl?: string;
+    buttonColor?: ButtonColor;
+    customButtonColor?: string;
 }
 
 const PIXEL_PRESETS: Record<Exclude<PixelPlatform, 'none'>, { label: string; events: string[]; placeholder: string; help: string }> = {
@@ -100,10 +104,11 @@ export default function Editor() {
             return;
         }
         const parsed = JSON.parse(sessionData);
-        // 默认: template=classic / distribution=pwa / language=继承首页 UI
+        // 默认: template=classic / distribution=pwa / language=继承首页 UI / buttonColor=rainbow
         setConfig({
             template: 'classic',
             distribution: 'pwa',
+            buttonColor: 'rainbow',
             language: parsed.language || initialLang,
             ...parsed,
         });
@@ -351,6 +356,81 @@ export default function Editor() {
                                         <div>{tpl.label}</div>
                                     </button>
                                 ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* ---- 按钮颜色 ---- */}
+                    <Card className="bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 border-violet-500/20">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="flex items-center gap-2 text-base">
+                                <Palette className="w-4 h-4 text-violet-400" />
+                                {uiLang === 'zh' ? '按钮颜色' : 'Button Color'}
+                            </CardTitle>
+                            {config.template === 'playstore' && (
+                                <p className="text-xs text-amber-400 mt-1">
+                                    {uiLang === 'zh'
+                                        ? '⚠️ Google Play 模板按钮永远是官方深绿色 (此设置仅在 Classic / 大图模板生效)'
+                                        : '⚠️ PlayStore template uses official green (only Classic / Floating templates respect this)'}
+                                </p>
+                            )}
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                                {BUTTON_COLOR_OPTIONS.map((opt) => {
+                                    const selected = (config.buttonColor || 'rainbow') === opt.id;
+                                    return (
+                                        <button
+                                            key={opt.id}
+                                            type="button"
+                                            onClick={() => handleChange('buttonColor', opt.id)}
+                                            title={opt.label[uiLang]}
+                                            className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${
+                                                selected ? 'border-violet-400 scale-110 shadow-lg' : 'border-white/10 hover:border-white/30'
+                                            }`}
+                                            style={{ background: opt.swatch }}
+                                        >
+                                            {selected && (
+                                                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                                    <span className="text-white text-xs font-bold drop-shadow">✓</span>
+                                                </div>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* 当选 "自定义" 时显示 hex 输入 + color picker */}
+                            {config.buttonColor === 'custom' && (
+                                <div className="grid gap-1.5">
+                                    <Label htmlFor="customColor">{uiLang === 'zh' ? '自定义颜色 (hex)' : 'Custom color (hex)'}</Label>
+                                    <div className="flex gap-2 items-center">
+                                        <input
+                                            type="color"
+                                            value={config.customButtonColor || '#3b82f6'}
+                                            onChange={(e) => handleChange('customButtonColor', e.target.value)}
+                                            className="h-10 w-10 rounded border border-white/10 bg-transparent cursor-pointer"
+                                        />
+                                        <Input
+                                            id="customColor"
+                                            value={config.customButtonColor || ''}
+                                            onChange={(e) => handleChange('customButtonColor', e.target.value)}
+                                            placeholder="#3b82f6"
+                                            className="flex-1 font-mono"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 实时按钮预览 */}
+                            <div className="pt-2">
+                                <div className="text-[10px] text-neutral-500 mb-1">{uiLang === 'zh' ? '预览' : 'Preview'}</div>
+                                <div
+                                    className={`${buttonStyle(config.buttonColor, config.customButtonColor).className} w-full h-10 rounded-lg font-semibold text-sm flex items-center justify-center`}
+                                    style={buttonStyle(config.buttonColor, config.customButtonColor).style}
+                                >
+                                    {previewInstallLabel(config)}
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -607,6 +687,8 @@ export default function Editor() {
                             if (config.installLabel) p.set('label', config.installLabel);
                             if (config.heroImage) p.set('hero', config.heroImage);
                             if (config.apkUrl) p.set('apk', config.apkUrl);
+                            if (config.buttonColor && config.buttonColor !== 'rainbow') p.set('btn', config.buttonColor);
+                            if (config.customButtonColor) p.set('btncolor', config.customButtonColor);
                             if (config.screenshots?.length) p.set('shots', config.screenshots.join(','));
                             if (config.reviews?.rating) p.set('rating', String(config.reviews.rating));
                             if (config.reviews?.reviewCount) p.set('reviews', config.reviews.reviewCount);
@@ -671,6 +753,7 @@ function previewInstallLabel(config: AppConfig): string {
 function PreviewClassic({ config }: { config: AppConfig }) {
     const isDark = config.backgroundColor === '#000000' || config.backgroundColor === '#000';
     const textColor = isDark ? 'text-white' : 'text-neutral-900';
+    const bs = buttonStyle(config.buttonColor, config.customButtonColor);
     return (
         <div className="min-h-full flex flex-col items-center justify-center p-6" style={{ backgroundColor: config.backgroundColor || '#fff' }}>
             <div className={`text-center max-w-md w-full ${textColor}`}>
@@ -680,7 +763,7 @@ function PreviewClassic({ config }: { config: AppConfig }) {
                 </div>
                 <h2 className="text-xl font-bold mb-2 line-clamp-2">{config.name}</h2>
                 <p className="opacity-70 mb-6 text-sm leading-snug line-clamp-3">{config.description}</p>
-                <div className="rainbow-button w-full py-3 rounded-full font-bold">
+                <div className={`${bs.className} w-full py-3 rounded-full font-bold`} style={bs.style}>
                     {previewInstallLabel(config)}
                 </div>
             </div>
@@ -833,14 +916,19 @@ function PreviewFloating({ config }: { config: AppConfig }) {
                 )}
             </div>
 
-            {/* 底部悬浮按钮 (彩虹动画) */}
+            {/* 底部悬浮按钮 (跟随 buttonColor 配置) */}
             <div
                 className="absolute bottom-0 left-0 right-0 z-20 px-3 pt-10 pb-3"
                 style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0.7) 100%)' }}
             >
-                <div className="rainbow-button w-full py-3 rounded-2xl font-bold text-center text-sm">
-                    {previewInstallLabel(config)}
-                </div>
+                {(() => {
+                    const bs = buttonStyle(config.buttonColor, config.customButtonColor);
+                    return (
+                        <div className={`${bs.className} w-full py-3 rounded-2xl font-bold text-center text-sm`} style={bs.style}>
+                            {previewInstallLabel(config)}
+                        </div>
+                    );
+                })()}
             </div>
         </div>
     );

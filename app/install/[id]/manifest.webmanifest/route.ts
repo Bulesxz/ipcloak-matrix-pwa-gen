@@ -13,17 +13,20 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
         return new Response('Not Found', { status: 404 });
     }
 
+    // ⭐ start_url = 用户真正想让 PWA 打开的目标网站 (app.url)
+    //   留空时 fallback 到 install 页本身 (至少能打开, 不报错)
+    const startUrl = app.url?.trim() || `/install/${id}`;
+
     const manifest = {
         name: app.name,
         short_name: app.name.slice(0, 12),
         description: app.description,
-        start_url: `/install/${id}`,
+        start_url: startUrl,
+        // scope 留在 install 路径下让 sw 注册兼容
         scope: `/install/${id}`,
         display: 'standalone',
         background_color: app.backgroundColor || '#ffffff',
         theme_color: app.backgroundColor || '#ffffff',
-        // Chrome 安装条件: 至少一个 icon, sizes 包含 192 / 512 / "any"
-        // 用 sizes="any" 让 Chrome 不去校验真实像素 (因为我们不知道用户网站的真实尺寸)
         icons: [
             { src: app.iconUrl, sizes: 'any', type: 'image/png', purpose: 'any' },
         ],

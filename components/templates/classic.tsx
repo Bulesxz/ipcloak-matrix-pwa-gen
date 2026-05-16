@@ -6,12 +6,15 @@ import ApkButton from '@/components/apk-button';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { t } from '@/lib/i18n';
+import { buttonStyle } from '@/lib/button-style';
 import type { AppConfig } from '@/lib/db';
 
 export default function ClassicTemplate({ app }: { app: AppConfig }) {
     const lang = app.language || 'zh';
     const isDark = app.backgroundColor === '#000000' || app.backgroundColor === '#000';
     const textColor = isDark ? 'text-white' : 'text-neutral-900';
+    const bs = buttonStyle(app.buttonColor, app.customButtonColor);
+    const btnCls = `${bs.className} w-full h-14 text-lg rounded-full font-bold flex items-center justify-center gap-2`;
 
     return (
         <div
@@ -31,13 +34,15 @@ export default function ClassicTemplate({ app }: { app: AppConfig }) {
                             apkUrl={app.apkUrl}
                             lang={lang}
                             customLabel={app.installLabel}
-                            buttonClassName="rainbow-button w-full h-14 text-lg rounded-full font-bold flex items-center justify-center gap-2"
+                            buttonClassName={btnCls}
+                            buttonStyle={bs.style}
                         />
                     ) : (
                         <InstallPrompt
                             lang={lang}
                             customLabel={app.installLabel}
-                            buttonClassName="rainbow-button w-full h-14 text-lg rounded-full font-bold flex items-center justify-center gap-2"
+                            buttonClassName={btnCls}
+                            buttonStyle={bs.style}
                         />
                     )}
                     <Link href={app.url} target="_blank" className="block">

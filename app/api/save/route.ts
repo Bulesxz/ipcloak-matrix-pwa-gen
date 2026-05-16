@@ -7,6 +7,8 @@ const ALLOWED_PLATFORMS = new Set(['none', 'facebook', 'tiktok', 'kwai']);
 const ALLOWED_TEMPLATES = new Set(['classic', 'playstore', 'floating']);
 const ALLOWED_LANGS = new Set(['zh', 'en']);
 const ALLOWED_DISTRIBUTIONS = new Set(['pwa', 'apk']);
+const ALLOWED_BUTTON_COLORS = new Set(['rainbow', 'blue', 'green', 'orange', 'red', 'black', 'purple', 'custom']);
+const HEX_RE = /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/;
 
 function sanitizePixel(input: unknown): PixelConfig | undefined {
     if (!input || typeof input !== 'object') return undefined;
@@ -78,6 +80,12 @@ export async function POST(request: Request) {
             heroImage: typeof body.heroImage === 'string' ? body.heroImage.slice(0, 2000) : undefined,
             distribution,
             apkUrl: typeof body.apkUrl === 'string' ? body.apkUrl.slice(0, 2000) : undefined,
+            buttonColor: typeof body.buttonColor === 'string' && ALLOWED_BUTTON_COLORS.has(body.buttonColor)
+                ? (body.buttonColor as 'rainbow')
+                : undefined,
+            customButtonColor: typeof body.customButtonColor === 'string' && HEX_RE.test(body.customButtonColor)
+                ? body.customButtonColor
+                : undefined,
         });
 
         return NextResponse.json(savedApp);

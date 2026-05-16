@@ -16,7 +16,7 @@ import PixelTracker from '@/components/pixel-tracker';
 import ClassicTemplate from '@/components/templates/classic';
 import PlaystoreTemplate from '@/components/templates/playstore';
 import FloatingTemplate from '@/components/templates/floating';
-import type { AppConfig, AppTemplate, AppLanguage, AppDistribution, PixelConfig } from '@/lib/db';
+import type { AppConfig, AppTemplate, AppLanguage, AppDistribution, PixelConfig, ButtonColor } from '@/lib/db';
 
 export const runtime = 'edge';
 
@@ -61,6 +61,9 @@ function buildConfig(sp: SearchParams): AppConfig {
         installLabel: pickStr(sp.label),
         heroImage: pickStr(sp.hero),
         apkUrl: pickStr(sp.apk),
+        buttonColor: (['rainbow', 'blue', 'green', 'orange', 'red', 'black', 'purple', 'custom'].includes(pickStr(sp.btn) || '')
+            ? pickStr(sp.btn) as ButtonColor : undefined),
+        customButtonColor: pickStr(sp.btncolor),
         reviews: pickStr(sp.rating) || pickStr(sp.downloads) ? {
             rating: pickStr(sp.rating) ? Number(pickStr(sp.rating)) : undefined,
             reviewCount: pickStr(sp.reviews),

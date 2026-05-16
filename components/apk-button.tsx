@@ -22,9 +22,11 @@ export interface ApkButtonProps {
     customLabel?: string;
     /** 自定义 className (各模板覆盖 width / 颜色 / 圆角) */
     buttonClassName?: string;
+    /** 自定义 inline style (主要给 custom hex 颜色用) */
+    buttonStyle?: React.CSSProperties;
 }
 
-export default function ApkButton({ apkUrl, lang = 'zh', customLabel, buttonClassName }: ApkButtonProps) {
+export default function ApkButton({ apkUrl, lang = 'zh', customLabel, buttonClassName, buttonStyle }: ApkButtonProps) {
     const label = customLabel?.trim() || t(lang, 'downloadApk');
 
     if (!apkUrl?.trim()) {
@@ -52,6 +54,7 @@ export default function ApkButton({ apkUrl, lang = 'zh', customLabel, buttonClas
     return (
         <Button
             onClick={handleClick}
+            style={buttonStyle}
             className={buttonClassName || 'w-full h-14 text-lg bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full'}
         >
             <Download className="w-5 h-5 mr-2" />
