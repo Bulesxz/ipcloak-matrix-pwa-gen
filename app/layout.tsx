@@ -154,7 +154,7 @@ const jsonLd = {
         "https://armor.ipcloak.ai",
         "https://browser.ipcloak.ai",
         "https://page.ipcloak.ai",
-        "https://scrm.ipcloak.ai",
+        "https://builder.ipcloak.ai",
       ],
     },
 
