@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Save, Smartphone, Activity, Star, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save, Smartphone, Activity, Star, Image as ImageIcon, Sparkles, Languages } from 'lucide-react';
 import { dict, type Dict } from '@/lib/i18n';
+
+const STORAGE_KEY = 'pwa-gen-lang';
 
 type PixelPlatform = 'none' | 'facebook' | 'tiktok' | 'kwai';
 type Template = 'classic' | 'playstore' | 'floating';
@@ -68,20 +70,39 @@ export default function Editor() {
     const router = useRouter();
     const [config, setConfig] = useState<AppConfig | null>(null);
     const [loading, setLoading] = useState(false);
-    /** 编辑器 UI 自身的语言 (跟 config.language 解耦, 默认 zh) */
-    const [uiLang] = useState<Language>('zh');
+    /** 编辑器 UI 语言: localStorage > 浏览器语言 > zh (跟首页同源) */
+    const [uiLang, setUiLang] = useState<Language>('zh');
     const t: Dict = dict[uiLang];
 
     useEffect(() => {
-        const stored = sessionStorage.getItem('scannedApp');
-        if (!stored) {
+        // 1. 同步 UI 语言
+        const stored = (typeof localStorage !== 'undefined' && localStorage.getItem(STORAGE_KEY)) as Language | null;
+        let initialLang: Language;
+        if (stored === 'zh' || stored === 'en') {
+            initialLang = stored;
+        } else if (typeof navigator !== 'undefined') {
+            initialLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+        } else {
+            initialLang = 'zh';
+        }
+        setUiLang(initialLang);
+
+        // 2. 加载扫站数据
+        const sessionData = sessionStorage.getItem('scannedApp');
+        if (!sessionData) {
             router.push('/');
             return;
         }
-        const parsed = JSON.parse(stored);
-        // 默认 template 用 classic, language 用 zh
-        setConfig({ template: 'classic', language: 'zh', ...parsed });
+        const parsed = JSON.parse(sessionData);
+        // 默认 template = classic, language 优先继承 parsed.language (首页扫站时带过来), 否则用 UI 语言
+        setConfig({ template: 'classic', language: parsed.language || initialLang, ...parsed });
     }, [router]);
+
+    const toggleUiLang = () => {
+        const next: Language = uiLang === 'zh' ? 'en' : 'zh';
+        setUiLang(next);
+        try { localStorage.setItem(STORAGE_KEY, next); } catch {}
+    };
 
     if (!config) return <div className="min-h-screen bg-neutral-950 flex items-center justify-center text-white">Loading...</div>;
 
@@ -134,6 +155,17 @@ export default function Editor() {
 
     return (
         <div className="min-h-screen bg-neutral-950 text-white flex flex-col md:flex-row">
+            {/* 顶部右上语言切换 (跟首页同源) */}
+            <button
+                type="button"
+                onClick={toggleUiLang}
+                className="fixed top-4 right-4 z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 hover:bg-white/15 text-sm text-neutral-200 backdrop-blur-md transition"
+                aria-label="Toggle language"
+            >
+                <Languages className="w-3.5 h-3.5" />
+                {uiLang === 'zh' ? 'EN' : '中文'}
+            </button>
+
             {/* ============ Sidebar / Form ============ */}
             <div className="w-full md:w-1/2 p-6 md:p-10 border-r border-white/10 overflow-y-auto max-h-screen">
                 <Button variant="ghost" className="mb-6 text-neutral-400 hover:text-white pl-0" onClick={() => router.push('/')}>
