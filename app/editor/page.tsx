@@ -146,6 +146,21 @@ export default function Editor() {
     };
 
     const handleSave = async () => {
+        // 前端校验
+        if (!config.name?.trim()) {
+            alert(uiLang === 'zh' ? '请填写 App 名称' : 'Please fill in App Name');
+            return;
+        }
+        if (!config.url?.trim()) {
+            alert(uiLang === 'zh' ? '请填写网站 URL (PWA 启动地址)' : 'Please fill in Website URL (PWA start URL)');
+            return;
+        }
+        // APK 模式: APK URL 必填
+        if (config.distribution === 'apk' && !config.apkUrl?.trim()) {
+            alert(uiLang === 'zh' ? '选择了 APK 下载模式, 请填写 APK 下载地址' : 'APK distribution selected, please fill APK download URL');
+            return;
+        }
+
         setLoading(true);
         try {
             const res = await fetch('/api/save', {
@@ -153,16 +168,26 @@ export default function Editor() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(config),
             });
-            if (!res.ok) throw new Error('Failed to save');
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({ error: 'Unknown error' })) as { error?: string };
+                throw new Error(errData.error || `HTTP ${res.status}`);
+            }
             const savedApp = (await res.json()) as { id: string };
             router.push(`/install/${savedApp.id}`);
         } catch (error) {
             console.error(error);
-            alert('Failed to save');
+            alert((uiLang === 'zh' ? '保存失败: ' : 'Save failed: ') + (error instanceof Error ? error.message : String(error)));
         } finally {
             setLoading(false);
         }
     };
+
+    // 是否可以生成 (name + url 必填, APK 模式还需要 apkUrl)
+    const canGenerate = !!(
+        config.name?.trim()
+        && config.url?.trim()
+        && (config.distribution !== 'apk' || config.apkUrl?.trim())
+    );
 
     return (
         <div className="min-h-screen bg-neutral-950 text-white flex flex-col md:flex-row">
@@ -544,9 +569,28 @@ export default function Editor() {
                         </CardContent>
                     </Card>
 
-                    <Button onClick={handleSave} disabled={loading} className="w-full h-12 text-lg bg-green-500 hover:bg-green-600 text-black font-semibold">
+                    <Button
+                        onClick={handleSave}
+                        disabled={loading || !canGenerate}
+                        className="w-full h-12 text-lg bg-green-500 hover:bg-green-600 text-black font-semibold disabled:bg-neutral-700 disabled:text-neutral-400 disabled:cursor-not-allowed"
+                    >
                         {loading ? t.editorGenerating : <><Save className="w-5 h-5 mr-2" /> {t.editorGenerate}</>}
                     </Button>
+                    {!canGenerate && !loading && (
+                        <div className="text-[11px] text-amber-400 text-center mt-1">
+                            {uiLang === 'zh'
+                                ? `还差: ${[
+                                    !config.name?.trim() && 'App 名称',
+                                    !config.url?.trim() && '网站 URL',
+                                    config.distribution === 'apk' && !config.apkUrl?.trim() && 'APK 下载地址',
+                                ].filter(Boolean).join(' / ')}`
+                                : `Missing: ${[
+                                    !config.name?.trim() && 'App Name',
+                                    !config.url?.trim() && 'URL',
+                                    config.distribution === 'apk' && !config.apkUrl?.trim() && 'APK URL',
+                                ].filter(Boolean).join(' / ')}`}
+                        </div>
+                    )}
 
                     <button
                         type="button"

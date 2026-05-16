@@ -1,30 +1,37 @@
 /**
- * pwa.ipcloak.ai self-unregister service worker
+ * pwa.ipcloak.ai self-unregister service worker (v3)
  *
- * 唯一作用: 立即注销自己 + 清掉所有 cache, 让历史上注册的老 sw 失效。
- * 不带 fetch handler (避免 Chrome no-op 警告 + 避免拦截请求)。
- * 不主动 navigate clients (Chrome 新版禁止, 会抛 TypeError)。
- *   - 用户下次刷新自然就没 sw 了, 不需要我们手动 reload。
+ * 唯一作用: 立即注销自己 + 清掉所有 cache.
+ *
+ * 防御性: 每一步都包 try/catch, 避免任何抛错 (即使 zombie 老 sw 还在跑也不影响新 sw 安装).
+ * 不带 fetch handler / 不主动 navigate.
  */
 
-self.addEventListener('install', () => {
-  self.skipWaiting();
+// 版本戳 - 改这个字符串能强制浏览器把本文件视为新版本 → 触发 sw update
+const SW_VERSION = 'v3-2026-05-16-noop-safe';
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(self.skipWaiting().catch(() => {}));
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
+    // 每一步都独立 try, 任何一步失败不影响下一步
     try {
-      // 1. 删掉所有 caches
       const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map((name) => caches.delete(name)));
+      await Promise.all(cacheNames.map((name) => caches.delete(name).catch(() => false)));
+    } catch (_) {}
 
-      // 2. 接管所有页面 (让 unregister 立即生效)
+    try {
       await self.clients.claim();
+    } catch (_) {}
 
-      // 3. unregister 自己
+    try {
       await self.registration.unregister();
-    } catch (err) {
-      console.warn('[sw] cleanup failed:', err);
-    }
+    } catch (_) {}
   })());
 });
+
+// 故意不注册 'message' 'fetch' 'push' 等任何 listener
+// 让 Chrome 完全把这个 sw 当 "纯 cleanup, 啥都不做" 处理
+console.log('[sw] loaded', SW_VERSION);
