@@ -512,7 +512,7 @@
 
   <div class="brand-chip" id="brand-chip">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/></svg>
-    <span data-zh="ipcloak.ai · W2A 生成器" data-en="ipcloak.ai · W2A Generator">ipcloak.ai · W2A 生成器</span>
+    <span data-zh="ipcloak.ai · PWA 安装页生成器" data-en="ipcloak.ai · PWA Installer Generator">ipcloak.ai · PWA 安装页生成器</span>
   </div>
 
   <!-- Scene 1: 痛点 -->
@@ -525,10 +525,10 @@
   <!-- Scene 2: 方案 Reveal -->
   <div class="scene" id="scene-2">
     <div class="badge" data-zh="✨ 解决方案" data-en="✨ The Solution">✨ 解决方案</div>
-    <div class="h1" data-zh="W2A" data-en="W2A">W2A</div>
+    <div class="h1" data-zh="PWA" data-en="PWA">PWA</div>
     <div class="gap"></div>
-    <div class="h1 h1-gradient" data-zh="一键生成 App" data-en="One-Click to App">一键生成 App</div>
-    <div class="sub" data-zh="把任何网站秒变可安装的应用" data-en="Turn any website into an installable app in seconds">把任何网站秒变可安装的应用</div>
+    <div class="h1 h1-gradient" data-zh="一键生成安装页" data-en="One-Click Install Page">一键生成安装页</div>
+    <div class="sub" data-zh="把任何网站秒变可安装的 App" data-en="Turn any website into an installable App in seconds">把任何网站秒变可安装的 App</div>
   </div>
 
   <!-- Scene 3: Demo -->
@@ -637,42 +637,51 @@
 
 <script>
   // ================================================
-  // 时间轴 (秒) — 30s 版本, 含 TTS 旁白
+  // 时间轴 (秒) — 45s 版本, 含 TTS 中文旁白 (PWA 核心)
   // ================================================
-  const TOTAL = 30.0;
+  const TOTAL = 45.0;
   const FPS = 60;
 
   const TIMELINE = [
-    { id: 'scene-1', start: 0.0,   end: 3.0,  brand: false },
-    { id: 'scene-2', start: 3.05,  end: 6.5,  brand: true },
-    { id: 'scene-3', start: 6.55,  end: 11.0, brand: true },
-    { id: 'scene-4', start: 11.05, end: 15.5, brand: true },
-    { id: 'scene-5', start: 15.55, end: 20.0, brand: true },
-    { id: 'scene-6', start: 20.05, end: 24.0, brand: true },
-    { id: 'scene-7', start: 24.05, end: 30.0, brand: false },
+    { id: 'scene-1', start: 0.0,   end: 5.0,  brand: false },  // 痛点
+    { id: 'scene-2', start: 5.05,  end: 10.5, brand: true },   // PWA 揭幕
+    { id: 'scene-3', start: 10.55, end: 17.0, brand: true },   // 3 模板演示
+    { id: 'scene-4', start: 17.05, end: 23.5, brand: true },   // PWA + APK
+    { id: 'scene-5', start: 23.55, end: 30.0, brand: true },   // 像素
+    { id: 'scene-6', start: 30.05, end: 36.5, brand: true },   // 社交证明
+    { id: 'scene-7', start: 36.55, end: 45.0, brand: false },  // CTA
   ];
 
   // ================================================
   // 旁白脚本 — TTS 生成器 (scripts/video/tts.py) 读取这个数组
   //   t        起始毫秒 (绝对时间)
   //   duration 这段旁白允许的最长时长 (毫秒), 超出会被 atempo 加速
-  //   zh / en  中英文旁白
+  //   zh       中文旁白 (主交付; 英文版已移除)
+  //
+  // 文案重点: PWA 是产品技术核心, 全程突出 PWA 概念
+  // 时长设计: 比 macOS say@240wpm 实际朗读时长留 30% 余量, 听起来不像快进
   // ================================================
   const SCRIPT = [
-    { t:   500, duration: 2400, zh: '你的落地页跳出率高达八成？广告预算正在一次次流失。',
-                                en: 'Your landing page bounce rate is eighty percent? Your ad budget is bleeding out.' },
-    { t:  3200, duration: 3200, zh: '其实有更优雅的解法 — PWA 安装页生成器。',
-                                en: 'There is a better way. The PWA install page generator.' },
-    { t:  6700, duration: 4200, zh: '输入网址，秒级生成精美安装页，三套模板任选。',
-                                en: 'Enter your URL. Generate a beautiful install page in seconds. Three templates to choose from.' },
-    { t: 11200, duration: 4200, zh: '用户一键添加到主屏幕，桌面图标直接以独立窗口启动你的网站。',
-                                en: 'Users add to home screen with one tap. The icon launches your site in a standalone window.' },
-    { t: 15700, duration: 4200, zh: 'Facebook、TikTok、Kwai 像素跟踪，安装成功事件自动回传广告平台。',
-                                en: 'Facebook, TikTok, Kwai pixel tracking. Install events fire straight to your ad platforms.' },
-    { t: 20200, duration: 3700, zh: '三千多投流团队正在使用，跨境电商、iGaming、社交、短剧全场景适用。',
-                                en: 'Over three thousand performance marketers use it. Cross-border, iGaming, social, drama, all use cases.' },
-    { t: 24200, duration: 5500, zh: '完全免费，无需注册。访问 pwa.ipcloak.ai，立即开始。',
-                                en: 'Free, no signup required. Visit pwa.ipcloak.ai. Get started now.' },
+    { t:   800, duration: 4000,
+      zh: '你的落地页跳出率高达八成？广告预算正在一次次流失。' },
+
+    { t:  5300, duration: 4800,
+      zh: '其实有更优雅的解法 — PWA 安装页生成器。' },
+
+    { t: 10800, duration: 5800,
+      zh: '输入网址，秒级生成精美的 PWA 安装页，三套模板任选。' },
+
+    { t: 17300, duration: 5800,
+      zh: '用户一键添加到主屏幕，桌面图标直接以独立窗口启动你的网站，体验接近原生 App。' },
+
+    { t: 23800, duration: 5800,
+      zh: 'Facebook、TikTok、Kwai 像素跟踪，PWA 安装成功事件自动回传广告平台。' },
+
+    { t: 30300, duration: 5800,
+      zh: '三千多投流团队正在使用，跨境电商、iGaming、社交、短剧全场景适用。' },
+
+    { t: 36800, duration: 7700,
+      zh: '完全免费，无需注册。访问 pwa.ipcloak.ai，立即开始制作你的 PWA 安装页。' },
   ];
   // 暴露给 TTS 脚本 (Puppeteer 也能拿到)
   window.__SCRIPT = SCRIPT;
