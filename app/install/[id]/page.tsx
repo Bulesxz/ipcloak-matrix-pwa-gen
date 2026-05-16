@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import PixelTracker from '@/components/pixel-tracker';
+import StandaloneRedirect from '@/components/standalone-redirect';
 import ClassicTemplate from '@/components/templates/classic';
 import PlaystoreTemplate from '@/components/templates/playstore';
 import FloatingTemplate from '@/components/templates/floating';
@@ -44,10 +45,18 @@ export default async function InstallPage({ params }: Props) {
     const app = await db.getApp(id);
     if (!app) notFound();
 
+    // PWA 模式才需要 standalone 检测跳转 (APK 模式不存在装到桌面这回事)
+    const launchUrl = app.distribution !== 'apk'
+        ? (app.targetUrl?.trim() || app.url)
+        : undefined;
+
     return (
         <>
             {/* 像素跟踪 — 安装成功时通过 window.__pwaPixelFire() 上报 */}
             <PixelTracker pixel={app.pixel} appId={app.id!} />
+
+            {/* 检测 standalone 模式 (PWA 从桌面启动) → 立即跳转到 target */}
+            <StandaloneRedirect launchUrl={launchUrl} />
 
             {/* 模板分发 */}
             {app.template === 'playstore' && <PlaystoreTemplate app={app} />}
