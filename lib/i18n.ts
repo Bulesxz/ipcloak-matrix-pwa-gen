@@ -33,7 +33,7 @@ export const dict = {
     // -- site (home) --
     siteTitle: 'PWA 安装页生成器 · 把网站装到桌面 + 像素跟踪 | ipcloak.ai',
     siteHero: '一键生成 PWA 安装页<br/>把网站装到桌面',
-    siteSub: '免开发、免审核 · 输入 URL 秒级生成 PWA 安装页, 用户加到桌面后获得原生 App 般的体验 — 离线访问、消息推送、独立窗口启动 · 内置 Facebook / TikTok / Kwai 像素跟踪',
+    siteSub: '免开发、免审核 · 输入 URL 秒级生成 PWA 安装页, 用户点击「添加到主屏幕」后, 桌面图标直接以独立窗口启动你的网站 · 安装成功事件自动回传 Facebook / TikTok / Kwai 像素',
     siteCTA: '立即生成',
     siteScanning: '扫描中...',
     siteFeature1: '即时预览',
@@ -94,7 +94,7 @@ export const dict = {
     // -- site (home) --
     siteTitle: 'PWA Installer Page Generator · Put your website on the home screen | ipcloak.ai',
     siteHero: 'Generate a PWA install page<br/>Put any website on the home screen',
-    siteSub: 'No development, no app store review · Generate a PWA install page from any URL in seconds — users get a native-app experience: offline access, push notifications, standalone window launch · Built-in Facebook / TikTok / Kwai pixel tracking',
+    siteSub: 'No development, no app store review · Generate a PWA install page from any URL in seconds — users "Add to Home Screen" and the icon launches your site in a standalone window · Install events auto-fire Facebook / TikTok / Kwai pixels',
     siteCTA: 'Generate Now',
     siteScanning: 'Scanning...',
     siteFeature1: 'Live Preview',

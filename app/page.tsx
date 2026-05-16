@@ -182,8 +182,8 @@ export default function Home() {
           {/* PWA 能力小条 (投流圈也称 W2A, 作为括注) */}
           <p className="text-xs text-neutral-500 mt-4 max-w-xl mx-auto">
             {lang === 'zh'
-              ? 'PWA 安装页 · 让用户把网站装到桌面, 离线可用 / 消息推送 / 独立启动 — 跨境投流圈也称 W2A (Web-to-App)'
-              : 'PWA install pages · users add your site to home screen for offline access, push notifications & standalone launch — known as W2A (Web-to-App) in performance marketing'}
+              ? 'PWA 安装页 · 让用户「添加到主屏幕」, 桌面图标直接以独立窗口启动你的网站 — 跨境投流圈也称 W2A (Web-to-App)'
+              : 'PWA install pages · users "Add to Home Screen", and the icon launches your site in a standalone window — known as W2A (Web-to-App) in performance marketing'}
           </p>
 
           <div className="pt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-left opacity-80">

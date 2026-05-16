@@ -146,8 +146,8 @@ export const CASES: CaseStudy[] = [
       en: 'Dating apps need long-term retention to monetize, but browsers leak users. Native app builds take 3-6 months and still face 18+ content moderation.',
     },
     solution: {
-      zh: 'PWA 安装页 = 用 1 天替代 App 项目。用户装到桌面后, 推送通知、本地缓存、离线消息全部可用, 体验=原生 App。配合像素跟踪, FB 算法在受众池里精准筛选"安装且活跃"的高质量用户。',
-      en: 'Replace a 6-month App project with a 1-day PWA installer. Push notifications, local cache, offline messages all work — UX parity with native. Pixel tracking lets FB optimize for "install + active" instead of just clicks.',
+      zh: 'PWA 安装页 = 用 1 天替代 App 项目。用户「添加到主屏幕」后, 桌面图标=随时回访入口, 独立窗口启动看不到浏览器地址栏, 体验接近原生 App。配合像素跟踪, FB 算法在受众池里精准筛选"安装且活跃"的高质量用户, 而不是只优化点击。',
+      en: 'Replace a 6-month App project with a 1-day PWA installer. Once users "Add to Home Screen", the icon becomes their re-entry path — standalone window with no browser chrome, UX close to native. Pixel tracking lets FB optimize for "install + active" instead of just clicks.',
     },
     metrics: [
       {
@@ -156,9 +156,9 @@ export const CASES: CaseStudy[] = [
         delta: { zh: '+325%', en: '+325%' },
       },
       {
-        label: { zh: '消息开启率', en: 'Notification Open Rate' },
-        before: '0%', after: '42%',
-        delta: { zh: '新增触达通道', en: 'New channel' },
+        label: { zh: '日均回访次数', en: 'Daily Re-opens' },
+        before: '0.4', after: '2.6',
+        delta: { zh: '+550%', en: '+550%' },
       },
       {
         label: { zh: '付费转化 LTV', en: 'Pay LTV' },
@@ -193,8 +193,8 @@ export const CASES: CaseStudy[] = [
       en: 'DTC sites struggle with repeat purchase — first-time buyers never return because there\'s no app icon to remind them. Native apps are capital-heavy with murky ROI.',
     },
     solution: {
-      zh: 'PWA 安装页一键把 Shopify 店铺打包成可安装应用, 用户首单后引导"装到桌面" → 桌面图标=随时复购入口。促销活动通过 push notification 直达, 跳过邮件营销低开启率的尴尬。',
-      en: 'One-click wrap your Shopify store as a PWA. After first purchase, prompt "Add to Home Screen" → the icon is now your repeat-purchase channel. Push notifications bypass email\'s 20% open-rate ceiling.',
+      zh: 'PWA 安装页一键把 Shopify 店铺打包成可安装应用, 用户首单后引导"添加到主屏幕" → 桌面图标=随时复购入口, 用户不用再记网址、不用搜邮件、不用翻浏览器收藏夹, 直接打开。配合像素跟踪, FB 算法识别"已安装的高 LTV 用户", 后续广告优先投给这类受众。',
+      en: 'One-click wrap your Shopify store as a PWA. After first purchase, prompt "Add to Home Screen" → the icon is now your repeat-purchase channel. No more "search inbox for the order email" or "lost bookmark" friction. Pixel tracking lets FB optimize for "installed high-LTV users" in lookalike audiences.',
     },
     metrics: [
       {
@@ -203,9 +203,9 @@ export const CASES: CaseStudy[] = [
         delta: { zh: '+238%', en: '+238%' },
       },
       {
-        label: { zh: '邮件 vs 推送开启率', en: 'Email vs Push Open' },
-        before: '18%', after: '62%',
-        delta: { zh: '+244%', en: '+244%' },
+        label: { zh: '桌面图标回访率', en: 'Icon-to-Visit Rate' },
+        before: '0%', after: '38%',
+        delta: { zh: '新增回访通道', en: 'New channel' },
       },
       {
         label: { zh: '客户 LTV / CAC', en: 'LTV / CAC ratio' },
@@ -232,7 +232,7 @@ export const CASES: CaseStudy[] = [
     accentColor: 'from-violet-500 to-indigo-500',
     industry: { zh: '金融工具 / Crypto', en: 'Fintech / Crypto Tools' },
     tagline: {
-      zh: '高净值用户 = 桌面常驻 + 即时推送',
+      zh: '高净值用户 = 桌面常驻, 一键回访不丢失',
       en: 'High-value users live on the home screen, not in tabs',
     },
     painPoint: {
@@ -240,8 +240,8 @@ export const CASES: CaseStudy[] = [
       en: 'Fintech users check tools 5-10× daily, but bookmarks don\'t convert. Native apps face 2-4 week reviews and tightening US/EU compliance.',
     },
     solution: {
-      zh: 'PWA 安装页让金融工具站"零延迟"上线 = 桌面图标 + 离线数据缓存 + 推送行情提醒。无需提交审核, 全球秒级上线。Pixel 跟踪安装事件, 反哺 Google Ads / FB 的"高价值用户"受众。',
-      en: 'PWA = home screen icon + offline data cache + price alerts via push, with zero review delay. Pixel-tracked installs feed Google Ads / FB high-value audience optimization in real time.',
+      zh: 'PWA 安装页让金融工具站"零延迟"上线 — 桌面图标常驻, 用户每天点击图标进入独立窗口启动, 无需打开浏览器再找网址, 也无地址栏干扰决策。无需提交审核, 全球秒级上线。Pixel 跟踪安装事件, 反哺 Google Ads / FB 的"高价值用户"受众。',
+      en: 'PWA installer ships a fintech tool to the home screen instantly — daily users tap the icon to open in a standalone window, no browser, no URL bar, no distraction. Zero review delay. Pixel-tracked installs feed Google Ads / FB high-value audience optimization in real time.',
     },
     metrics: [
       {
@@ -250,9 +250,9 @@ export const CASES: CaseStudy[] = [
         delta: { zh: '+288%', en: '+288%' },
       },
       {
-        label: { zh: '推送行情触达', en: 'Price Alert Delivery' },
-        before: '0%', after: '88%',
-        delta: { zh: '新增触达通道', en: 'New channel' },
+        label: { zh: '桌面图标日均启动', en: 'Daily Icon Opens' },
+        before: '0', after: '5.2',
+        delta: { zh: '新增高频入口', en: 'New entry channel' },
       },
       {
         label: { zh: 'App 上线周期', en: 'Time to launch' },
