@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { db, type PixelConfig } from '@/lib/db';
 
+export const runtime = 'edge';
+
 const ALLOWED_PLATFORMS = new Set(['none', 'facebook', 'tiktok', 'kwai']);
 
 function sanitizePixel(input: unknown): PixelConfig | undefined {
@@ -22,13 +24,13 @@ function sanitizePixel(input: unknown): PixelConfig | undefined {
 
 export async function POST(request: Request) {
     try {
-        const body = await request.json();
+        const body = (await request.json()) as Record<string, unknown>;
 
         if (!body.name || !body.url) {
             return NextResponse.json({ error: 'Name and URL are required' }, { status: 400 });
         }
 
-        const savedApp = db.saveApp({
+        const savedApp = await db.saveApp({
             id: typeof body.id === 'string' ? body.id : undefined,
             url: String(body.url).slice(0, 2000),
             name: String(body.name).slice(0, 200),

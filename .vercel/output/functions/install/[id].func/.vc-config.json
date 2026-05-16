@@ -1,0 +1,18 @@
+{
+  "runtime": "edge",
+  "name": "install/[id]",
+  "deploymentTarget": "v8-worker",
+  "entrypoint": "index.js",
+  "assets": [],
+  "framework": {
+    "slug": "nextjs",
+    "version": "16.1.6"
+  },
+  "environment": {
+    "__NEXT_BUILD_ID": "JqTscA8KudCyg7LUKBkrt",
+    "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "Arpt+LjX8PhjJuh4LvMzve/dFSc4oakUInLce7oi/RE=",
+    "__NEXT_PREVIEW_MODE_ID": "5792717911c49b0f55132e2db0e0ca50",
+    "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "6c338ef40e1167011d48b5e9e048c56ceb6f49e33dfdd80f22ed187fd14fea9e",
+    "__NEXT_PREVIEW_MODE_SIGNING_KEY": "2c31a36c0e50b4c89107eb30179373daa37d97d401562e4edaa9ccab2aaa375d"
+  }
+}

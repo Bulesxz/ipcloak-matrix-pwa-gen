@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:cf": "npx @cloudflare/next-on-pages@latest",
+    "preview": "wrangler pages dev .vercel/output/static --compatibility-flag=nodejs_compat",
+    "deploy": "./deploy.sh",
     "start": "next start",
     "lint": "next lint"
   },
@@ -23,11 +26,14 @@
     "vaul": "^1.1.2"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.16",
+    "@cloudflare/workers-types": "^4.20251111.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.90.0"
   }
 }

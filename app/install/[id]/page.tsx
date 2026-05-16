@@ -6,6 +6,8 @@ import { notFound } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 
+export const runtime = 'edge';
+
 interface Props {
     // Next 15+ params is a Promise
     params: Promise<{ id: string }>;
@@ -13,7 +15,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { id } = await params;
-    const app = db.getApp(id);
+    const app = await db.getApp(id);
     if (!app) return { title: 'App not found' };
 
     return {
@@ -29,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function InstallPage({ params }: Props) {
     const { id } = await params;
-    const app = db.getApp(id);
+    const app = await db.getApp(id);
 
     if (!app) {
         notFound();

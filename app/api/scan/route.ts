@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 
+export const runtime = 'edge';
+
 export async function POST(request: Request) {
     try {
-        const { url } = await request.json();
+        const { url } = (await request.json()) as { url?: string };
 
         if (!url) {
             return NextResponse.json({ error: 'URL is required' }, { status: 400 });

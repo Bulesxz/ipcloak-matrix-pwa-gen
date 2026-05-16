@@ -1,10 +1,11 @@
 /**
- * 极简 JSON 文件存储 (单机部署够用, 多实例请换 KV/Postgres)
- * 数据存在 ./data/apps.json
+ * PWA 配置存储
+ *
+ * 生产环境 (CF Pages): Cloudflare KV namespace "PWA_APPS"
+ * 本地 dev: 进程内 Map (重启清空, 仅作开发用)
+ *
+ * 依赖: @cloudflare/next-on-pages 在 edge runtime 下注入 ctx
  */
-import fs from 'fs';
-import path from 'path';
-import crypto from 'crypto';
 
 export interface PixelConfig {
   /** 一个 PWA 只配一个平台像素 */
@@ -32,50 +33,70 @@ export interface AppConfig {
   backgroundColor: string;
   /** ⭐ 新: 像素跟踪配置 */
   pixel?: PixelConfig;
-  /** 创建时间 (ms) */
-  createdAt?: number;
+  /** 创建时间 (ISO string, 跟旧版本兼容) */
+  createdAt?: string;
 }
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DATA_FILE = path.join(DATA_DIR, 'apps.json');
+const KV_BINDING_NAME = 'PWA_APPS';
 
-function ensure() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '{}', 'utf-8');
-}
+// ---- 本地 dev fallback (内存 Map) ----
+const memStore = new Map<string, AppConfig>();
 
-function readAll(): Record<string, AppConfig> {
-  ensure();
+/**
+ * 拿 KV namespace.
+ * 生产: 从 next-on-pages 注入的 env 拿
+ * dev: undefined → 走 memory
+ */
+async function getKV(): Promise<KVNamespace | null> {
   try {
-    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+    const { getOptionalRequestContext } = await import('@cloudflare/next-on-pages');
+    const ctx = getOptionalRequestContext();
+    if (!ctx) return null;
+    const env = ctx.env as Record<string, unknown>;
+    const kv = env[KV_BINDING_NAME];
+    return (kv as KVNamespace) || null;
   } catch {
-    return {};
+    return null;
   }
 }
 
-function writeAll(map: Record<string, AppConfig>) {
-  ensure();
-  fs.writeFileSync(DATA_FILE, JSON.stringify(map, null, 2), 'utf-8');
+/** 生成 UUID v4 (edge 兼容, 用 crypto.randomUUID) */
+function newId(): string {
+  return crypto.randomUUID();
 }
 
 export const db = {
-  getApp(id: string): AppConfig | null {
-    return readAll()[id] || null;
+  async getApp(id: string): Promise<AppConfig | null> {
+    const kv = await getKV();
+    if (kv) {
+      const raw = await kv.get(id);
+      return raw ? (JSON.parse(raw) as AppConfig) : null;
+    }
+    return memStore.get(id) || null;
   },
-  saveApp(input: AppConfig): AppConfig {
-    const map = readAll();
-    const id = input.id || crypto.randomBytes(6).toString('hex');
-    const saved: AppConfig = { ...input, id, createdAt: input.createdAt || Date.now() };
-    map[id] = saved;
-    writeAll(map);
+
+  async saveApp(input: AppConfig): Promise<AppConfig> {
+    const id = input.id || newId();
+    const saved: AppConfig = {
+      ...input,
+      id,
+      createdAt: input.createdAt || new Date().toISOString(),
+    };
+    const kv = await getKV();
+    if (kv) {
+      await kv.put(id, JSON.stringify(saved));
+    } else {
+      memStore.set(id, saved);
+    }
     return saved;
   },
-  listApps(): AppConfig[] {
-    return Object.values(readAll()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  },
-  deleteApp(id: string) {
-    const map = readAll();
-    delete map[id];
-    writeAll(map);
+
+  async deleteApp(id: string): Promise<void> {
+    const kv = await getKV();
+    if (kv) {
+      await kv.delete(id);
+    } else {
+      memStore.delete(id);
+    }
   },
 };

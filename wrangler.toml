@@ -1,0 +1,9 @@
+name = "pwa-gen"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".vercel/output/static"
+
+# 生产环境 KV (PWA 配置存储)
+[[kv_namespaces]]
+binding = "PWA_APPS"
+id = "514c1409dc50468e99ac5a22c1eda926"

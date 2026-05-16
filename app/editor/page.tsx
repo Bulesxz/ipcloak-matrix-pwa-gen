@@ -96,7 +96,7 @@ export default function Editor() {
 
             if (!res.ok) throw new Error('Failed to save');
 
-            const savedApp = await res.json();
+            const savedApp = (await res.json()) as { id: string };
             router.push(`/install/${savedApp.id}`);
         } catch (error) {
             console.error(error);
