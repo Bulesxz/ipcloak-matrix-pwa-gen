@@ -13,6 +13,7 @@
  *   底部 tab bar: 游戏 / 应用 / 图书 / 儿童
  */
 import InstallPrompt from '@/components/install-prompt';
+import ApkButton from '@/components/apk-button';
 import { Star, Search, HelpCircle, Share2, Bookmark, Smartphone, ChevronRight, Gamepad2, Grid3x3, BookOpen, Baby } from 'lucide-react';
 import { t } from '@/lib/i18n';
 import type { AppConfig } from '@/lib/db';
@@ -93,12 +94,21 @@ export default function PlaystoreTemplate({ app }: { app: AppConfig }) {
 
                 {/* ============ 安装按钮 (深绿 + 圆角 8px) ============ */}
                 <div className="mb-3">
-                    <InstallPrompt
-                        lang={lang}
-                        customLabel={app.installLabel}
-                        buttonClassName="rainbow-button w-full h-11 rounded-lg font-medium text-[15px] flex items-center justify-center"
-                        installedClassName="w-full h-11 rounded-lg bg-emerald-50 text-emerald-700 font-medium text-[15px] flex items-center justify-center gap-2 border border-emerald-200"
-                    />
+                    {app.distribution === 'apk' ? (
+                        <ApkButton
+                            apkUrl={app.apkUrl}
+                            lang={lang}
+                            customLabel={app.installLabel}
+                            buttonClassName="rainbow-button w-full h-11 rounded-lg font-medium text-[15px] flex items-center justify-center"
+                        />
+                    ) : (
+                        <InstallPrompt
+                            lang={lang}
+                            customLabel={app.installLabel}
+                            buttonClassName="rainbow-button w-full h-11 rounded-lg font-medium text-[15px] flex items-center justify-center"
+                            installedClassName="w-full h-11 rounded-lg bg-emerald-50 text-emerald-700 font-medium text-[15px] flex items-center justify-center gap-2 border border-emerald-200"
+                        />
+                    )}
                 </div>
 
                 {/* ============ 分享 + 心愿单 ============ */}

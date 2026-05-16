@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Smartphone, Sparkles, Loader2, Activity, Languages } from 'lucide-react';
+import { ArrowRight, Smartphone, Sparkles, Loader2, Activity, Languages, PlusCircle } from 'lucide-react';
 import { dict, type Dict } from '@/lib/i18n';
 
 type SiteLang = 'zh' | 'en';
@@ -121,6 +121,32 @@ export default function Home() {
               </form>
             </CardContent>
           </Card>
+
+          {/* "直接创建" 第二个 CTA — 不扫站, 全部素材自己填 */}
+          <div className="flex items-center justify-center gap-3 text-neutral-500 text-sm mt-4">
+            <div className="h-px w-12 bg-white/10" />
+            {lang === 'zh' ? '或' : 'or'}
+            <div className="h-px w-12 bg-white/10" />
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              // 直接给一个空 stub 进 editor (扫站结果模拟)
+              sessionStorage.setItem('scannedApp', JSON.stringify({
+                url: '',
+                name: '',
+                description: '',
+                iconUrl: '',
+                backgroundColor: '#ffffff',
+                language: lang,
+              }));
+              router.push('/editor');
+            }}
+            className="inline-flex items-center gap-2 text-purple-300 hover:text-white text-sm transition-colors"
+          >
+            <PlusCircle className="w-4 h-4" />
+            {lang === 'zh' ? '直接创建 (不扫站, 自己上传素材)' : 'Create from scratch (skip scan, upload your own)'}
+          </button>
 
           <div className="pt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-left opacity-80">
             <div className="flex flex-col gap-2 p-4 rounded-xl hover:bg-white/5 transition-colors">

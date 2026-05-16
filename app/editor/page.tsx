@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Save, Smartphone, Activity, Star, Image as ImageIcon, Sparkles, Languages, X } from 'lucide-react';
+import { ArrowLeft, Save, Smartphone, Activity, Star, Image as ImageIcon, Sparkles, Languages, X, Package } from 'lucide-react';
 import { dict, type Dict } from '@/lib/i18n';
 import UploadButton from '@/components/upload-button';
 
@@ -17,6 +17,7 @@ const STORAGE_KEY = 'pwa-gen-lang';
 type PixelPlatform = 'none' | 'facebook' | 'tiktok' | 'kwai';
 type Template = 'classic' | 'playstore' | 'floating';
 type Language = 'zh' | 'en';
+type Distribution = 'pwa' | 'apk';
 
 interface PixelConfig {
     platform: PixelPlatform;
@@ -46,6 +47,8 @@ interface AppConfig {
     screenshots?: string[];
     installLabel?: string;
     heroImage?: string;
+    distribution?: Distribution;
+    apkUrl?: string;
 }
 
 const PIXEL_PRESETS: Record<Exclude<PixelPlatform, 'none'>, { label: string; events: string[]; placeholder: string; help: string }> = {
@@ -97,8 +100,13 @@ export default function Editor() {
             return;
         }
         const parsed = JSON.parse(sessionData);
-        // 默认 template = classic, language 优先继承 parsed.language (首页扫站时带过来), 否则用 UI 语言
-        setConfig({ template: 'classic', language: parsed.language || initialLang, ...parsed });
+        // 默认: template=classic / distribution=pwa / language=继承首页 UI
+        setConfig({
+            template: 'classic',
+            distribution: 'pwa',
+            language: parsed.language || initialLang,
+            ...parsed,
+        });
     }, [router]);
 
     const toggleUiLang = () => {
@@ -233,6 +241,61 @@ export default function Editor() {
                             />
                         </div>
                     </div>
+
+                    {/* ---- 分发方式 (PWA H5 / APK 下载) ---- */}
+                    <Card className="bg-gradient-to-br from-orange-500/10 to-amber-500/10 border-orange-500/20">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="flex items-center gap-2 text-base">
+                                <Package className="w-4 h-4 text-orange-400" />
+                                {uiLang === 'zh' ? '分发方式' : 'Distribution'}
+                            </CardTitle>
+                            <p className="text-xs text-neutral-400 mt-1">
+                                {uiLang === 'zh' ? 'PWA = 添加到主屏幕；APK = 直接下载 .apk 文件' : 'PWA = Add to home screen; APK = Direct .apk download'}
+                            </p>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <div className="grid grid-cols-2 gap-2">
+                                {[
+                                    { id: 'pwa' as const, label: uiLang === 'zh' ? 'PWA 安装' : 'PWA Install', emoji: '📲' },
+                                    { id: 'apk' as const, label: uiLang === 'zh' ? 'APK 下载' : 'APK Download', emoji: '📦' },
+                                ].map((d) => (
+                                    <button
+                                        key={d.id}
+                                        type="button"
+                                        onClick={() => handleChange('distribution', d.id)}
+                                        className={`p-3 rounded-xl border text-sm transition-all ${
+                                            (config.distribution || 'pwa') === d.id
+                                                ? 'border-orange-400 bg-orange-500/20 text-white shadow-lg'
+                                                : 'border-white/10 bg-white/[0.02] text-neutral-400 hover:border-white/30'
+                                        }`}
+                                    >
+                                        <div className="text-xl mb-0.5">{d.emoji}</div>
+                                        <div>{d.label}</div>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {config.distribution === 'apk' && (
+                                <div className="grid gap-1.5">
+                                    <Label htmlFor="apkUrl">
+                                        {uiLang === 'zh' ? 'APK 下载地址' : 'APK Download URL'}
+                                    </Label>
+                                    <Input
+                                        id="apkUrl"
+                                        value={config.apkUrl || ''}
+                                        onChange={(e) => handleChange('apkUrl', e.target.value)}
+                                        placeholder="https://example.com/app.apk"
+                                        className="font-mono text-xs"
+                                    />
+                                    <p className="text-[11px] text-neutral-500">
+                                        {uiLang === 'zh'
+                                            ? 'APK 文件需要先传到你自己的服务器 / OSS / 蒲公英 / fir.im 等, 这里填可直接下载的 URL'
+                                            : 'Upload APK to your own server / OSS / Pgyer / fir.im first, then paste the direct download URL here'}
+                                    </p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
 
                     {/* ---- 模板选择 ---- */}
                     <Card className="bg-gradient-to-br from-pink-500/10 to-purple-500/10 border-pink-500/20">
@@ -484,6 +547,41 @@ export default function Editor() {
                     <Button onClick={handleSave} disabled={loading} className="w-full h-12 text-lg bg-green-500 hover:bg-green-600 text-black font-semibold">
                         {loading ? t.editorGenerating : <><Save className="w-5 h-5 mr-2" /> {t.editorGenerate}</>}
                     </Button>
+
+                    <button
+                        type="button"
+                        onClick={() => {
+                            const p = new URLSearchParams();
+                            if (config.name) p.set('name', config.name);
+                            if (config.description) p.set('desc', config.description);
+                            if (config.iconUrl) p.set('icon', config.iconUrl);
+                            if (config.url) p.set('url', config.url);
+                            if (config.backgroundColor) p.set('bg', config.backgroundColor);
+                            if (config.template) p.set('t', config.template);
+                            if (config.language) p.set('l', config.language);
+                            if (config.distribution) p.set('d', config.distribution);
+                            if (config.installLabel) p.set('label', config.installLabel);
+                            if (config.heroImage) p.set('hero', config.heroImage);
+                            if (config.apkUrl) p.set('apk', config.apkUrl);
+                            if (config.screenshots?.length) p.set('shots', config.screenshots.join(','));
+                            if (config.reviews?.rating) p.set('rating', String(config.reviews.rating));
+                            if (config.reviews?.reviewCount) p.set('reviews', config.reviews.reviewCount);
+                            if (config.reviews?.downloads) p.set('downloads', config.reviews.downloads);
+                            if (config.pixel?.platform === 'facebook' && config.pixel.pixelId) p.set('fb', config.pixel.pixelId);
+                            if (config.pixel?.platform === 'tiktok' && config.pixel.pixelId) p.set('tt', config.pixel.pixelId);
+                            if (config.pixel?.platform === 'kwai' && config.pixel.pixelId) p.set('kwai', config.pixel.pixelId);
+                            if (config.pixel?.event) p.set('event', config.pixel.event);
+
+                            const quickUrl = `${window.location.origin}/quick?${p.toString()}`;
+                            navigator.clipboard?.writeText(quickUrl).then(
+                                () => alert((uiLang === 'zh' ? '✓ 已复制无状态 URL 到剪贴板\n\n' : '✓ Stateless URL copied to clipboard\n\n') + quickUrl),
+                                () => prompt(uiLang === 'zh' ? '手动复制下方 URL:' : 'Copy URL manually:', quickUrl)
+                            );
+                        }}
+                        className="w-full mt-2 text-xs text-neutral-400 hover:text-purple-300 transition-colors"
+                    >
+                        {uiLang === 'zh' ? '🔗 复制无状态 URL (一键分享, 永久不过期)' : '🔗 Copy stateless URL (share-ready, never expires)'}
+                    </button>
                 </div>
             </div>
 

@@ -13,6 +13,8 @@ export const dict = {
     // -- install page --
     install: '安装到主屏幕',
     installed: '已安装到主屏幕',
+    downloadApk: '下载 APK',
+    apkUrlMissing: 'APK 下载链接尚未配置',
     iosShare: '点击底部 ⬆️ 分享按钮安装',
     iosStep1: '点击 Safari 底部 分享 按钮',
     iosStep2: '选择 "添加到主屏幕"',
@@ -72,6 +74,8 @@ export const dict = {
     // -- install page --
     install: 'Add to Home Screen',
     installed: 'Installed on Home Screen',
+    downloadApk: 'Download APK',
+    apkUrlMissing: 'APK download URL not configured',
     iosShare: 'Tap the ⬆️ Share button below',
     iosStep1: 'Tap Safari Share button at the bottom',
     iosStep2: 'Select "Add to Home Screen"',

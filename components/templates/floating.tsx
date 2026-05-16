@@ -9,6 +9,7 @@
  * 没传 hero 时 fallback: 用 icon 模糊放大当背景 (避免空白)
  */
 import InstallPrompt from '@/components/install-prompt';
+import ApkButton from '@/components/apk-button';
 import type { AppConfig } from '@/lib/db';
 
 export default function FloatingTemplate({ app }: { app: AppConfig }) {
@@ -57,12 +58,21 @@ export default function FloatingTemplate({ app }: { app: AppConfig }) {
                 }}
             >
                 <div className="max-w-md mx-auto pointer-events-auto">
-                    <InstallPrompt
-                        lang={lang}
-                        customLabel={app.installLabel}
-                        buttonClassName="rainbow-button w-full h-14 text-lg rounded-2xl font-bold flex items-center justify-center gap-2"
-                        installedClassName="w-full h-14 rounded-2xl bg-green-500/30 text-green-100 font-bold flex items-center justify-center gap-2 backdrop-blur-sm border border-green-400/30"
-                    />
+                    {app.distribution === 'apk' ? (
+                        <ApkButton
+                            apkUrl={app.apkUrl}
+                            lang={lang}
+                            customLabel={app.installLabel}
+                            buttonClassName="rainbow-button w-full h-14 text-lg rounded-2xl font-bold flex items-center justify-center gap-2"
+                        />
+                    ) : (
+                        <InstallPrompt
+                            lang={lang}
+                            customLabel={app.installLabel}
+                            buttonClassName="rainbow-button w-full h-14 text-lg rounded-2xl font-bold flex items-center justify-center gap-2"
+                            installedClassName="w-full h-14 rounded-2xl bg-green-500/30 text-green-100 font-bold flex items-center justify-center gap-2 backdrop-blur-sm border border-green-400/30"
+                        />
+                    )}
                 </div>
             </div>
         </div>

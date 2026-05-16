@@ -26,6 +26,7 @@ export interface PixelConfig {
 
 export type AppTemplate = 'classic' | 'playstore' | 'floating';
 export type AppLanguage = 'zh' | 'en';
+export type AppDistribution = 'pwa' | 'apk';
 
 export interface AppReviews {
   /** 平均评分 (0-5), 可选填 */
@@ -57,6 +58,10 @@ export interface AppConfig {
   installLabel?: string;
   /** ⭐ Floating 模板的 hero 大图 URL (留空时 fallback 到 icon 模糊背景) */
   heroImage?: string;
+  /** ⭐ 分发方式: pwa = H5 安装到主屏幕 (默认), apk = 下载 APK 文件 */
+  distribution?: AppDistribution;
+  /** ⭐ APK 下载 URL (distribution=apk 时必填) */
+  apkUrl?: string;
   /** 创建时间 (ISO string, 跟旧版本兼容) */
   createdAt?: string;
 }

@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
-import { db, type PixelConfig, type AppReviews, type AppTemplate, type AppLanguage } from '@/lib/db';
+import { db, type PixelConfig, type AppReviews, type AppTemplate, type AppLanguage, type AppDistribution } from '@/lib/db';
 
 export const runtime = 'edge';
 
 const ALLOWED_PLATFORMS = new Set(['none', 'facebook', 'tiktok', 'kwai']);
 const ALLOWED_TEMPLATES = new Set(['classic', 'playstore', 'floating']);
 const ALLOWED_LANGS = new Set(['zh', 'en']);
+const ALLOWED_DISTRIBUTIONS = new Set(['pwa', 'apk']);
 
 function sanitizePixel(input: unknown): PixelConfig | undefined {
     if (!input || typeof input !== 'object') return undefined;
@@ -57,6 +58,9 @@ export async function POST(request: Request) {
         const language: AppLanguage = typeof body.language === 'string' && ALLOWED_LANGS.has(body.language)
             ? (body.language as AppLanguage)
             : 'zh';
+        const distribution: AppDistribution = typeof body.distribution === 'string' && ALLOWED_DISTRIBUTIONS.has(body.distribution)
+            ? (body.distribution as AppDistribution)
+            : 'pwa';
 
         const savedApp = await db.saveApp({
             id: typeof body.id === 'string' ? body.id : undefined,
@@ -72,6 +76,8 @@ export async function POST(request: Request) {
             screenshots: sanitizeScreenshots(body.screenshots),
             installLabel: typeof body.installLabel === 'string' ? body.installLabel.slice(0, 32) : undefined,
             heroImage: typeof body.heroImage === 'string' ? body.heroImage.slice(0, 2000) : undefined,
+            distribution,
+            apkUrl: typeof body.apkUrl === 'string' ? body.apkUrl.slice(0, 2000) : undefined,
         });
 
         return NextResponse.json(savedApp);
