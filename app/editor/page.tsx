@@ -545,61 +545,121 @@ function PreviewClassic({ config }: { config: AppConfig }) {
 }
 
 function PreviewPlaystore({ config }: { config: AppConfig }) {
-    const lang = config.language || 'zh';
+    const isZh = (config.language || 'zh') === 'zh';
     const rating = config.reviews?.rating;
     const downloads = config.reviews?.downloads;
+    const reviewCount = config.reviews?.reviewCount;
     const screenshots = config.screenshots || [];
+    const dev = tryHost(config.url);
+
     return (
-        <div className="min-h-full bg-white text-neutral-900">
-            <div className="sticky top-0 bg-white border-b border-neutral-100 flex items-center justify-between px-3 py-2 text-neutral-700 text-xs">
-                <span>←</span><span>⋮</span>
+        <div className="min-h-full bg-white text-neutral-900 pb-14">
+            {/* Top bar (Google Play logo + 图标) */}
+            <div className="sticky top-0 z-50 bg-white border-b border-neutral-100 flex items-center justify-between px-3 py-2">
+                <div className="flex items-center gap-1.5">
+                    <span className="inline-block w-[14px] h-[14px] bg-gradient-to-br from-blue-400 via-yellow-400 to-green-500 rounded-sm" />
+                    <span className="text-[12px] font-medium text-neutral-700">Google Play</span>
+                </div>
+                <div className="flex items-center gap-2 text-neutral-700">
+                    <span className="text-[11px]">🔍</span>
+                    <span className="text-[11px]">?</span>
+                    <span className="w-4 h-4 rounded-full bg-purple-200 text-purple-700 text-[8px] flex items-center justify-center font-bold">I</span>
+                </div>
             </div>
-            <div className="p-4">
-                <div className="flex gap-3 mb-4">
-                    <div className="w-16 h-16 rounded-xl overflow-hidden shadow-sm bg-neutral-100 flex-shrink-0">
+
+            <div className="px-3">
+                {/* App header */}
+                <div className="flex gap-2.5 items-start pt-3 mb-3">
+                    <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm bg-neutral-100 flex-shrink-0">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={config.iconUrl} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <div className="text-base font-bold leading-tight line-clamp-2">{config.name}</div>
-                        <div className="text-xs text-emerald-700 truncate">{tryHost(config.url)}</div>
+                        <div className="text-[13px] font-medium leading-tight line-clamp-2">{config.name}</div>
+                        <div className="text-[11px] text-emerald-700 truncate">{dev}</div>
+                        <div className="text-[9px] text-neutral-500 mt-0.5">{isZh ? '包含广告 · 应用内购' : 'Contains ads · IAP'}</div>
                     </div>
                 </div>
-                {(rating !== undefined || downloads) && (
-                    <div className="flex border border-neutral-100 rounded-xl mb-3 divide-x divide-neutral-100 text-[10px]">
-                        {rating !== undefined && (
-                            <div className="flex-1 py-2 text-center">
-                                <div className="font-bold text-sm">{rating.toFixed(1)} ★</div>
-                                <div className="text-neutral-500">{config.reviews?.reviewCount || (lang === 'en' ? 'reviews' : '评论')}</div>
-                            </div>
-                        )}
-                        {downloads && (
-                            <div className="flex-1 py-2 text-center">
-                                <div className="font-bold text-sm">{downloads}</div>
-                                <div className="text-neutral-500">{lang === 'en' ? 'Downloads' : '下载'}</div>
-                            </div>
-                        )}
-                        <div className="flex-1 py-2 text-center">
-                            <div className="inline-flex items-center justify-center w-4 h-4 rounded border border-neutral-400 text-[8px] font-bold">3+</div>
-                            <div className="text-neutral-500">Rated</div>
+
+                {/* 3 列统计 */}
+                <div className="flex items-stretch mb-3">
+                    <div className="flex-1 py-1.5 text-center border-r border-neutral-100">
+                        <div className="flex items-center justify-center gap-0.5 font-medium text-[11px]">
+                            {rating !== undefined ? rating.toFixed(1) : '—'}
+                            <span className="text-[8px]">★</span>
                         </div>
+                        <div className="text-[8px] text-neutral-500 truncate px-0.5">{reviewCount || (isZh ? '暂无' : 'None')}</div>
                     </div>
-                )}
-                <div className="w-full h-9 rounded-full bg-emerald-600 text-white font-semibold text-xs flex items-center justify-center mb-4">
+                    <div className="flex-1 py-1.5 text-center border-r border-neutral-100">
+                        <div className="inline-flex items-center justify-center w-5 h-5 rounded border border-neutral-400 text-[8px] font-bold text-neutral-700">3+</div>
+                        <div className="text-[8px] text-neutral-500 mt-0.5">{isZh ? '3 岁以上' : 'Rated 3+'}</div>
+                    </div>
+                    <div className="flex-1 py-1.5 text-center">
+                        <div className="font-medium text-[11px]">{downloads || '—'}</div>
+                        <div className="text-[8px] text-neutral-500 truncate px-0.5">{isZh ? '次下载' : 'Downloads'}</div>
+                    </div>
+                </div>
+
+                {/* 安装按钮 */}
+                <div className="w-full h-8 rounded-md bg-[#1b6f47] text-white font-medium text-[11px] flex items-center justify-center mb-2">
                     {previewInstallLabel(config)}
                 </div>
+
+                {/* 分享 + 心愿单 */}
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                    <div className="h-7 flex items-center justify-center gap-1 text-emerald-700 text-[10px] font-medium">
+                        <span>↗</span>{isZh ? '分享' : 'Share'}
+                    </div>
+                    <div className="h-7 flex items-center justify-center gap-1 text-emerald-700 text-[10px] font-medium">
+                        <span>+</span>{isZh ? '添加到心愿单' : 'Wishlist'}
+                    </div>
+                </div>
+
+                {/* 设备 */}
+                <div className="flex items-center gap-2 py-2 mb-2 text-[9px] text-neutral-600 border-b border-neutral-100">
+                    <span>📱</span>
+                    {isZh ? '在您的设备上可以使用' : 'Available for your device'}
+                </div>
+
+                {/* 截图 */}
                 {screenshots.length > 0 && (
-                    <div className="-mx-4 mb-4 overflow-x-auto px-4">
-                        <div className="flex gap-2" style={{ width: 'max-content' }}>
+                    <div className="mb-3 -mx-3 overflow-x-auto px-3 scrollbar-hide">
+                        <div className="flex gap-1.5" style={{ width: 'max-content' }}>
                             {screenshots.slice(0, 5).map((src, i) => (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img key={i} src={src} alt="" className="h-32 rounded-md object-cover bg-neutral-100" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                <div key={i} className="w-20 h-36 rounded-lg overflow-hidden bg-neutral-100 border border-neutral-100 flex-shrink-0">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={src} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                </div>
                             ))}
                         </div>
                     </div>
                 )}
-                <div className="text-xs font-semibold mb-1">{lang === 'en' ? 'About this app' : '应用介绍'}</div>
-                <p className="text-[11px] text-neutral-700 leading-snug line-clamp-5">{config.description}</p>
+
+                {/* 游戏简介 */}
+                <div className="mb-3">
+                    <div className="flex items-center justify-between mb-1.5">
+                        <div className="text-[11px] font-medium">{isZh ? '游戏简介' : 'About this app'}</div>
+                        <span className="text-neutral-400 text-[10px]">›</span>
+                    </div>
+                    <p className="text-[9px] text-neutral-700 leading-snug line-clamp-5">{config.description}</p>
+                </div>
+            </div>
+
+            {/* 底部 tab bar */}
+            <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-neutral-100 grid grid-cols-4">
+                {[
+                    { emoji: '🎮', label: isZh ? '游戏' : 'Games' },
+                    { emoji: '⊞', label: isZh ? '应用' : 'Apps', active: true },
+                    { emoji: '📖', label: isZh ? '图书' : 'Books' },
+                    { emoji: '👶', label: isZh ? '儿童' : 'Kids' },
+                ].map(({ emoji, label, active }, i) => (
+                    <div key={i} className="flex flex-col items-center py-1 gap-0.5">
+                        <div className={active ? 'h-5 w-8 rounded-full bg-emerald-50 flex items-center justify-center text-[9px]' : 'h-5 flex items-center justify-center text-[10px]'}>
+                            <span className={active ? 'text-emerald-700' : 'text-neutral-500'}>{emoji}</span>
+                        </div>
+                        <div className={`text-[8px] ${active ? 'text-emerald-700 font-medium' : 'text-neutral-500'}`}>{label}</div>
+                    </div>
+                ))}
             </div>
         </div>
     );
