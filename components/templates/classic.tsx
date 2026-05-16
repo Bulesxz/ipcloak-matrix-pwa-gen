@@ -43,6 +43,7 @@ export default function ClassicTemplate({ app }: { app: AppConfig }) {
                             customLabel={app.installLabel}
                             buttonClassName={btnCls}
                             buttonStyle={bs.style}
+                            launchUrl={app.targetUrl?.trim() || app.url}
                         />
                     )}
                     <Link href={app.targetUrl?.trim() || app.url} target="_blank" className="block">

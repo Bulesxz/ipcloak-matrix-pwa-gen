@@ -75,6 +75,7 @@ export default function FloatingTemplate({ app }: { app: AppConfig }) {
                             buttonClassName={btnCls}
                             buttonStyle={bs.style}
                             installedClassName="w-full h-14 rounded-2xl bg-green-500/30 text-green-100 font-bold flex items-center justify-center gap-2 backdrop-blur-sm border border-green-400/30"
+                            launchUrl={app.targetUrl?.trim() || app.url}
                         />
                     )}
                 </div>

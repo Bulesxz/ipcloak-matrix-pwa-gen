@@ -107,6 +107,7 @@ export default function PlaystoreTemplate({ app }: { app: AppConfig }) {
                             customLabel={app.installLabel}
                             buttonClassName="w-full h-11 rounded-lg bg-[#1b6f47] hover:bg-[#15573a] text-white font-medium text-[15px] flex items-center justify-center"
                             installedClassName="w-full h-11 rounded-lg bg-emerald-50 text-emerald-700 font-medium text-[15px] flex items-center justify-center gap-2 border border-emerald-200"
+                            launchUrl={app.targetUrl?.trim() || app.url}
                         />
                     )}
                 </div>

@@ -31,9 +31,11 @@ export interface InstallPromptProps {
   customLabel?: string;
   /** 自定义按钮 inline style (主要给 custom hex 颜色用) */
   buttonStyle?: React.CSSProperties;
+  /** 安装成功后跳转的目标 URL (避免用户留在安装页). 留空不跳. */
+  launchUrl?: string;
 }
 
-export default function InstallPrompt({ lang = 'zh', buttonClassName, installedClassName, customLabel, buttonStyle }: InstallPromptProps) {
+export default function InstallPrompt({ lang = 'zh', buttonClassName, installedClassName, customLabel, buttonStyle, launchUrl }: InstallPromptProps) {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [status, setStatus] = useState<Status>('pending');
 
@@ -69,6 +71,13 @@ export default function InstallPrompt({ lang = 'zh', buttonClassName, installedC
         setStatus('installed');
         window.__pwaPixelFire?.();
         console.log('[install-prompt] PWA installed, pixel fired');
+        // ⭐ 安装成功后立即跳转到目标 URL, 避免用户卡在 "已安装" 提示页
+        //   等 1.2s 让 pixel 上报完, 也给用户看到 "已安装" 的视觉反馈
+        if (launchUrl?.trim()) {
+          setTimeout(() => {
+            window.location.href = launchUrl;
+          }, 1200);
+        }
       };
 
       window.addEventListener('beforeinstallprompt', onBeforeInstall);
