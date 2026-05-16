@@ -5,9 +5,9 @@
  * - 加载对应平台的 Pixel SDK
  * - 暴露 window.__pwaPixelFire(eventName) 给 install-prompt 在安装成功回调时调用
  *
- * 安装成功的判定条件 (优先级):
- *   1. window.addEventListener('appinstalled')  ← Chrome/Edge/Android, 99% 准
- *   2. iOS: 用户从主屏幕打开 PWA 时 display-mode: standalone, 二次访问触发
+ * 触发时机:
+ *   Chrome/Edge/Android: install-prompt 监听 'appinstalled' 事件 (浏览器原生安装成功回调)
+ *   iOS Safari: 不支持 (Apple 不提供安装成功 API, 无法回调)
  *
  * 浏览器端 Pixel only (不做 CAPI), 客户在 FB/TT/Kwai 后台能看到 ad-attributed conversion。
  */
@@ -104,15 +104,8 @@ export default function PixelTracker({ pixel, appId }: PixelTrackerProps) {
         console.error('[pixel] fire failed:', err);
       }
     };
-
-    // iOS standalone 检测: 用户从主屏幕打开 PWA 时也算一次成功安装
-    if (window.matchMedia?.('(display-mode: standalone)').matches || (navigator as Navigator & { standalone?: boolean }).standalone) {
-      const flag = `pwa_install_reported_${appId}`;
-      if (!sessionStorage.getItem(flag)) {
-        sessionStorage.setItem(flag, '1');
-        setTimeout(() => window.__pwaPixelFire?.(), 1500);
-      }
-    }
+    // 注: iOS Safari 没有 appinstalled 回调, 也不通过 standalone 反推
+    //     iOS 不支持 Pixel 跟踪, 但 PWA 安装本身还能正常用 (走手动 "添加到主屏幕")
   }, [enabled, pixel, appId]);
 
   if (!enabled || !pixel) return null;
