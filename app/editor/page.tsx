@@ -229,16 +229,21 @@ export default function Editor() {
 
                         <div className="grid w-full items-center gap-1.5">
                             <Label htmlFor="url">
-                                {uiLang === 'zh' ? '扫站源 URL (抓取 manifest/icon 用)' : 'Source URL (for scanning manifest/icon)'}
+                                {uiLang === 'zh' ? '网站地址' : 'Website URL'}
                             </Label>
                             <Input id="url" value={config.url} onChange={(e) => handleChange('url', e.target.value)} placeholder="https://example.com" />
+                            <p className="text-[11px] text-neutral-500">
+                                {uiLang === 'zh'
+                                    ? '你的网站主页, 用来获取图标和名称'
+                                    : 'Your website homepage — used to fetch icon and meta'}
+                            </p>
                         </div>
 
                         {/* PWA 模式才显示 targetUrl 字段 (APK 模式有自己的 apkUrl) */}
                         {config.distribution !== 'apk' && (
                             <div className="grid w-full items-center gap-1.5">
                                 <Label htmlFor="targetUrl">
-                                    {uiLang === 'zh' ? '目标地址 (PWA 启动时打开, 留空走源 URL)' : 'Target URL (opens on PWA launch, fallback to source)'}
+                                    {uiLang === 'zh' ? '安装后打开的链接 (可选)' : 'Open URL on launch (optional)'}
                                 </Label>
                                 <Input
                                     id="targetUrl"
@@ -248,8 +253,8 @@ export default function Editor() {
                                 />
                                 <p className="text-[11px] text-neutral-500">
                                     {uiLang === 'zh'
-                                        ? '常用: 让 PWA 直接打开带广告参数的落地页, 跟扫站源 URL 解耦'
-                                        : 'Use case: open a specific landing page with UTM params, decoupled from scan source'}
+                                        ? '留空 → 安装后打开上面的「网站地址」。填了 → 安装后打开这个 (常用: 带 UTM 参数的落地页)'
+                                        : 'Empty → opens "Website URL" above. Filled → opens this (e.g. landing page with UTM)'}
                                 </p>
                             </div>
                         )}
