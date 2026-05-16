@@ -13,10 +13,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
         return new Response('Not Found', { status: 404 });
     }
 
-    // ⭐ start_url 优先级: targetUrl > url > install 页
-    //   targetUrl 是 PWA 装到桌面后点图标真正打开的地址
-    //   url 是用来扫站的源, 跟 targetUrl 可不一样
-    const startUrl = app.targetUrl?.trim() || app.url?.trim() || `/install/${id}`;
+    // ⭐ start_url 必须同源 (Chrome 严格要求, 跨域会被拒绝):
+    //   start_url 指向同源的 /install/[id]/launch route,
+    //   该 route 服务端 302 跳到真正的 targetUrl (可外部).
+    //   targetUrl 为空时, launch route 会用 url 兜底.
+    const startUrl = `/install/${id}/launch`;
 
     const manifest = {
         name: app.name,
