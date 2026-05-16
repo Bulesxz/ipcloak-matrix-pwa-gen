@@ -22,9 +22,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
         display: 'standalone',
         background_color: app.backgroundColor || '#ffffff',
         theme_color: app.backgroundColor || '#ffffff',
+        // Chrome 安装条件: 至少一个 icon, sizes 包含 192 / 512 / "any"
+        // 用 sizes="any" 让 Chrome 不去校验真实像素 (因为我们不知道用户网站的真实尺寸)
         icons: [
-            { src: app.iconUrl, sizes: '192x192', type: 'image/png', purpose: 'any' },
-            { src: app.iconUrl, sizes: '512x512', type: 'image/png', purpose: 'any' },
+            { src: app.iconUrl, sizes: 'any', type: 'image/png', purpose: 'any' },
         ],
     };
 
