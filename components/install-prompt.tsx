@@ -27,9 +27,11 @@ export interface InstallPromptProps {
   buttonClassName?: string;
   /** 自定义已安装态 className */
   installedClassName?: string;
+  /** 自定义安装按钮文字 (留空走 i18n 默认) */
+  customLabel?: string;
 }
 
-export default function InstallPrompt({ lang = 'zh', buttonClassName, installedClassName }: InstallPromptProps) {
+export default function InstallPrompt({ lang = 'zh', buttonClassName, installedClassName, customLabel }: InstallPromptProps) {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [status, setStatus] = useState<Status>('pending');
 
@@ -95,11 +97,13 @@ export default function InstallPrompt({ lang = 'zh', buttonClassName, installedC
     );
   }
 
+  const installLabel = customLabel?.trim() || t(lang, 'install');
+
   if (status === 'ios') {
     return (
       <div className="space-y-3">
         <div className={buttonClassName || 'w-full py-4 px-4 bg-blue-600 text-white rounded-full font-bold shadow-lg text-center'}>
-          {t(lang, 'iosShare')}
+          {customLabel?.trim() || t(lang, 'iosShare')}
         </div>
         <div className="text-xs opacity-70 leading-relaxed text-left bg-white/50 rounded-lg p-3 space-y-1">
           <div>1. {t(lang, 'iosStep1')}</div>
@@ -114,7 +118,7 @@ export default function InstallPrompt({ lang = 'zh', buttonClassName, installedC
     return (
       <Button onClick={handleInstall} className={buttonClassName || 'w-full h-14 text-lg bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full'}>
         <Download className="w-5 h-5 mr-2" />
-        {t(lang, 'install')}
+        {installLabel}
       </Button>
     );
   }

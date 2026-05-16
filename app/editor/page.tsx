@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Save, Smartphone, Activity, Star, Image as ImageIcon, Sparkles, Languages } from 'lucide-react';
+import { ArrowLeft, Save, Smartphone, Activity, Star, Image as ImageIcon, Sparkles, Languages, X } from 'lucide-react';
 import { dict, type Dict } from '@/lib/i18n';
+import UploadButton from '@/components/upload-button';
 
 const STORAGE_KEY = 'pwa-gen-lang';
 
@@ -43,6 +44,8 @@ interface AppConfig {
     language?: Language;
     reviews?: Reviews;
     screenshots?: string[];
+    installLabel?: string;
+    heroImage?: string;
 }
 
 const PIXEL_PRESETS: Record<Exclude<PixelPlatform, 'none'>, { label: string; events: string[]; placeholder: string; help: string }> = {
@@ -192,7 +195,10 @@ export default function Editor() {
 
                         <div className="grid w-full items-center gap-1.5">
                             <Label htmlFor="icon">{t.editorIcon}</Label>
-                            <Input id="icon" value={config.iconUrl} onChange={(e) => handleChange('iconUrl', e.target.value)} />
+                            <div className="flex gap-2 items-start">
+                                <Input id="icon" value={config.iconUrl} onChange={(e) => handleChange('iconUrl', e.target.value)} className="flex-1" />
+                                <UploadButton onUploaded={(url) => handleChange('iconUrl', url)} iconOnly />
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
@@ -215,6 +221,16 @@ export default function Editor() {
                                     <option value="en">English</option>
                                 </Select>
                             </div>
+                        </div>
+
+                        <div className="grid w-full items-center gap-1.5">
+                            <Label htmlFor="installLabel">{uiLang === 'zh' ? '安装按钮文字 (留空走默认)' : 'Install button label (empty = default)'}</Label>
+                            <Input
+                                id="installLabel"
+                                value={config.installLabel || ''}
+                                onChange={(e) => handleChange('installLabel', e.target.value)}
+                                placeholder={config.language === 'en' ? 'Add to Home Screen' : '安装到主屏幕'}
+                            />
                         </div>
                     </div>
 
@@ -250,6 +266,50 @@ export default function Editor() {
                             </div>
                         </CardContent>
                     </Card>
+
+                    {/* ---- Floating 模板专属: hero 大图 ---- */}
+                    {config.template === 'floating' && (
+                        <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="flex items-center gap-2 text-base">
+                                    <ImageIcon className="w-4 h-4 text-blue-400" />
+                                    {uiLang === 'zh' ? 'Hero 大图 (全屏背景)' : 'Hero Image (full-screen background)'}
+                                </CardTitle>
+                                <p className="text-xs text-neutral-400 mt-1">
+                                    {uiLang === 'zh'
+                                        ? '建议尺寸 1080×1920+, 留空时用 icon 模糊背景代替'
+                                        : 'Recommended 1080×1920+, falls back to blurred icon if empty'}
+                                </p>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                {config.heroImage && (
+                                    <div className="relative">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={config.heroImage} alt="hero" className="w-full h-32 object-cover rounded-lg border border-white/10" />
+                                        <button
+                                            type="button"
+                                            onClick={() => handleChange('heroImage', '')}
+                                            className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/70 text-white flex items-center justify-center"
+                                        >
+                                            <X className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                )}
+                                <div className="flex gap-2 items-start">
+                                    <Input
+                                        value={config.heroImage || ''}
+                                        onChange={(e) => handleChange('heroImage', e.target.value)}
+                                        placeholder="https://..."
+                                        className="flex-1"
+                                    />
+                                    <UploadButton
+                                        onUploaded={(url) => handleChange('heroImage', url)}
+                                        iconOnly
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
 
                     {/* ---- PlayStore 模板专属: 评分 + 截图 ---- */}
                     {config.template === 'playstore' && (
@@ -295,18 +355,50 @@ export default function Editor() {
                                     </div>
                                 </div>
 
-                                <div className="grid gap-1.5">
-                                    <Label htmlFor="screenshots" className="flex items-center gap-1.5">
+                                <div className="grid gap-2">
+                                    <Label className="flex items-center gap-1.5">
                                         <ImageIcon className="w-3.5 h-3.5" />
                                         {t.editorScreenshots}
                                     </Label>
-                                    <Textarea
-                                        id="screenshots"
-                                        value={(config.screenshots || []).join('\n')}
-                                        onChange={(e) => handleScreenshotsChange(e.target.value)}
-                                        placeholder={`https://example.com/screenshot-1.jpg\nhttps://example.com/screenshot-2.jpg`}
-                                        className="min-h-[80px] font-mono text-xs"
-                                    />
+
+                                    {/* 缩略图列表 + 删除 */}
+                                    {(config.screenshots || []).length > 0 && (
+                                        <div className="flex gap-2 flex-wrap">
+                                            {(config.screenshots || []).map((url, i) => (
+                                                <div key={i} className="relative group">
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                    <img src={url} alt={`screenshot ${i + 1}`} className="h-20 w-14 object-cover rounded border border-white/10" />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleChange('screenshots', (config.screenshots || []).filter((_, idx) => idx !== i))}
+                                                        className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* 上传按钮 (限 5 张) */}
+                                    {(config.screenshots || []).length < 5 && (
+                                        <UploadButton
+                                            label={uiLang === 'zh' ? '上传截图' : 'Upload screenshot'}
+                                            onUploaded={(url) => handleChange('screenshots', [...(config.screenshots || []), url].slice(0, 5))}
+                                            className="h-10 w-fit px-3"
+                                        />
+                                    )}
+
+                                    {/* 也支持手动贴 URL */}
+                                    <details className="text-xs text-neutral-500">
+                                        <summary className="cursor-pointer hover:text-neutral-300">{uiLang === 'zh' ? '或贴 URL (每行一个, 最多 5 张)' : 'Or paste URLs (one per line, max 5)'}</summary>
+                                        <Textarea
+                                            value={(config.screenshots || []).join('\n')}
+                                            onChange={(e) => handleScreenshotsChange(e.target.value)}
+                                            placeholder="https://example.com/screenshot-1.jpg"
+                                            className="min-h-[80px] font-mono text-xs mt-2"
+                                        />
+                                    </details>
                                 </div>
                             </CardContent>
                         </Card>
@@ -427,6 +519,11 @@ function PreviewBody({ config }: { config: AppConfig }) {
     return <PreviewClassic config={config} />;
 }
 
+function previewInstallLabel(config: AppConfig): string {
+    if (config.installLabel?.trim()) return config.installLabel.trim();
+    return config.language === 'en' ? 'Add to Home Screen' : '安装到主屏幕';
+}
+
 function PreviewClassic({ config }: { config: AppConfig }) {
     const isDark = config.backgroundColor === '#000000' || config.backgroundColor === '#000';
     const textColor = isDark ? 'text-white' : 'text-neutral-900';
@@ -440,7 +537,7 @@ function PreviewClassic({ config }: { config: AppConfig }) {
                 <h2 className="text-xl font-bold mb-2 line-clamp-2">{config.name}</h2>
                 <p className="opacity-70 mb-6 text-sm leading-snug line-clamp-3">{config.description}</p>
                 <div className="w-full py-3 bg-blue-600 text-white rounded-full font-bold">
-                    {config.language === 'en' ? 'Add to Home Screen' : '安装到主屏幕'}
+                    {previewInstallLabel(config)}
                 </div>
             </div>
         </div>
@@ -489,7 +586,7 @@ function PreviewPlaystore({ config }: { config: AppConfig }) {
                     </div>
                 )}
                 <div className="w-full h-9 rounded-full bg-emerald-600 text-white font-semibold text-xs flex items-center justify-center mb-4">
-                    {lang === 'en' ? 'Install' : '安装'}
+                    {previewInstallLabel(config)}
                 </div>
                 {screenshots.length > 0 && (
                     <div className="-mx-4 mb-4 overflow-x-auto px-4">
@@ -511,23 +608,32 @@ function PreviewPlaystore({ config }: { config: AppConfig }) {
 function PreviewFloating({ config }: { config: AppConfig }) {
     const isDark = config.backgroundColor === '#000000' || config.backgroundColor === '#000';
     const textColor = isDark ? 'text-white' : 'text-neutral-900';
+    const hero = config.heroImage?.trim();
     return (
         <div className="min-h-full relative flex flex-col" style={{ backgroundColor: config.backgroundColor || '#fff' }}>
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={config.iconUrl} alt="" className="w-full h-full object-cover opacity-30 blur-2xl scale-150" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                {hero ? (
+                    <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={hero} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                        <div className="absolute inset-0" style={{ background: isDark ? `linear-gradient(180deg, transparent 40%, ${config.backgroundColor}cc 85%, ${config.backgroundColor} 100%)` : `linear-gradient(180deg, transparent 40%, rgba(255,255,255,0.85) 85%, ${config.backgroundColor || '#fff'} 100%)` }} />
+                    </>
+                ) : (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={config.iconUrl} alt="" className="w-full h-full object-cover opacity-30 blur-2xl scale-150" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                )}
             </div>
-            <div className={`relative z-10 flex-1 flex flex-col items-center justify-center px-6 pb-32 ${textColor}`}>
-                <div className="w-24 h-24 rounded-[22px] shadow-2xl overflow-hidden mb-5 bg-white">
+            <div className={`relative z-10 flex-1 flex flex-col items-center justify-end px-6 pb-32 pt-6 ${textColor}`}>
+                <div className="w-20 h-20 rounded-[18px] shadow-2xl overflow-hidden mb-4 bg-white">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={config.iconUrl} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                 </div>
-                <h2 className="text-xl font-bold mb-2 text-center line-clamp-2">{config.name}</h2>
-                <p className="opacity-70 mb-3 text-sm leading-snug text-center line-clamp-3">{config.description}</p>
+                <h2 className="text-lg font-bold mb-2 text-center line-clamp-2 drop-shadow-sm">{config.name}</h2>
+                <p className="opacity-80 mb-3 text-xs leading-snug text-center line-clamp-3 drop-shadow-sm">{config.description}</p>
             </div>
             <div className="absolute bottom-3 left-3 right-3 z-20">
                 <div className="w-full py-3 bg-blue-600 text-white rounded-2xl font-bold text-center shadow-lg">
-                    {config.language === 'en' ? 'Add to Home Screen' : '安装到主屏幕'}
+                    {previewInstallLabel(config)}
                 </div>
             </div>
         </div>

@@ -70,6 +70,8 @@ export async function POST(request: Request) {
             language,
             reviews: sanitizeReviews(body.reviews),
             screenshots: sanitizeScreenshots(body.screenshots),
+            installLabel: typeof body.installLabel === 'string' ? body.installLabel.slice(0, 32) : undefined,
+            heroImage: typeof body.heroImage === 'string' ? body.heroImage.slice(0, 2000) : undefined,
         });
 
         return NextResponse.json(savedApp);

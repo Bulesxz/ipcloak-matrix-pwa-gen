@@ -80,6 +80,7 @@ export default function PlaystoreTemplate({ app }: { app: AppConfig }) {
                 <div className="mb-6">
                     <InstallPrompt
                         lang={lang}
+                        customLabel={app.installLabel}
                         buttonClassName="w-full h-12 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-base"
                         installedClassName="w-full h-12 rounded-full bg-emerald-100 text-emerald-700 font-semibold text-base flex items-center justify-center gap-2"
                     />

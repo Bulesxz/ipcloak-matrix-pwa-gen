@@ -53,6 +53,10 @@ export interface AppConfig {
   reviews?: AppReviews;
   /** ⭐ 截图 URL 数组 (PlayStore 模板可选, max 5 张) */
   screenshots?: string[];
+  /** ⭐ 安装按钮自定义文字 (留空走 i18n 默认 "安装到主屏幕" / "Add to Home Screen") */
+  installLabel?: string;
+  /** ⭐ Floating 模板的 hero 大图 URL (留空时 fallback 到 icon 模糊背景) */
+  heroImage?: string;
   /** 创建时间 (ISO string, 跟旧版本兼容) */
   createdAt?: string;
 }

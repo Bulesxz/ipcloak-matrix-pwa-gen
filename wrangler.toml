@@ -7,3 +7,10 @@ pages_build_output_dir = ".vercel/output/static"
 [[kv_namespaces]]
 binding = "PWA_APPS"
 id = "514c1409dc50468e99ac5a22c1eda926"
+
+# 生产环境 R2 (图片 / 截图上传)
+# 注: "ASSETS" 是 CF Pages 保留字, 必须用别的 binding 名
+# Public URL: https://pub-b2aa5c35beea4d878b33ca47541656e7.r2.dev
+[[r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "pwa-gen-assets"
