@@ -666,33 +666,42 @@ function PreviewPlaystore({ config }: { config: AppConfig }) {
 }
 
 function PreviewFloating({ config }: { config: AppConfig }) {
-    const isDark = config.backgroundColor === '#000000' || config.backgroundColor === '#000';
+    const bg = config.backgroundColor || '#fff';
+    const isDark = bg === '#000000' || bg === '#000';
     const textColor = isDark ? 'text-white' : 'text-neutral-900';
     const hero = config.heroImage?.trim();
     return (
-        <div className="min-h-full relative flex flex-col" style={{ backgroundColor: config.backgroundColor || '#fff' }}>
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="min-h-full relative flex flex-col" style={{ backgroundColor: bg }}>
+            {/* Hero 上 50% (跟生产保持一致) */}
+            <div className="relative w-full h-[50%] min-h-[200px] overflow-hidden flex-shrink-0">
                 {hero ? (
                     <>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={hero} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                        <div className="absolute inset-0" style={{ background: isDark ? `linear-gradient(180deg, transparent 40%, ${config.backgroundColor}cc 85%, ${config.backgroundColor} 100%)` : `linear-gradient(180deg, transparent 40%, rgba(255,255,255,0.85) 85%, ${config.backgroundColor || '#fff'} 100%)` }} />
+                        <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none" style={{ background: `linear-gradient(180deg, transparent 0%, ${bg} 100%)` }} />
                     </>
                 ) : (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={config.iconUrl} alt="" className="w-full h-full object-cover opacity-30 blur-2xl scale-150" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    <div className="w-full h-full relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={config.iconUrl} alt="" className="w-full h-full object-cover opacity-20 blur-2xl scale-150" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                        <div className="absolute inset-0" style={{ background: isDark ? `linear-gradient(180deg, rgba(255,255,255,0.05) 0%, ${bg} 100%)` : `linear-gradient(180deg, rgba(0,0,0,0.04) 0%, ${bg} 100%)` }} />
+                    </div>
                 )}
             </div>
-            <div className={`relative z-10 flex-1 flex flex-col items-center justify-end px-6 pb-32 pt-6 ${textColor}`}>
-                <div className="w-20 h-20 rounded-[18px] shadow-2xl overflow-hidden mb-4 bg-white">
+
+            {/* icon + 信息 (向上叠 hero) */}
+            <div className={`flex-1 flex flex-col items-center px-4 pb-20 -mt-8 relative z-10 ${textColor}`}>
+                <div className="w-16 h-16 rounded-[16px] shadow-xl overflow-hidden bg-white ring-2 ring-white/80">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={config.iconUrl} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                 </div>
-                <h2 className="text-lg font-bold mb-2 text-center line-clamp-2 drop-shadow-sm">{config.name}</h2>
-                <p className="opacity-80 mb-3 text-xs leading-snug text-center line-clamp-3 drop-shadow-sm">{config.description}</p>
+                <h2 className="text-base font-bold mt-3 mb-1.5 text-center line-clamp-2">{config.name}</h2>
+                <p className="opacity-70 mb-3 text-[11px] leading-snug text-center line-clamp-4 px-2">{config.description}</p>
             </div>
+
+            {/* 底部悬浮按钮 (绝对定位, 不超出手机壳) */}
             <div className="absolute bottom-3 left-3 right-3 z-20">
-                <div className="w-full py-3 bg-blue-600 text-white rounded-2xl font-bold text-center shadow-lg">
+                <div className="w-full py-3 bg-blue-600 text-white rounded-2xl font-bold text-center shadow-lg text-sm">
                     {previewInstallLabel(config)}
                 </div>
             </div>
