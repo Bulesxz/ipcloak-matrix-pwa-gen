@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>IPCloak.AI W2A — Promo</title>
+<style>
+  :root {
+    --c-bg-from: #1a0033;
+    --c-bg-via: #0a0a0a;
+    --c-bg-to: #001a33;
+    --c-purple: #c084fc;
+    --c-pink: #f472b6;
+    --c-blue: #60a5fa;
+    --c-green: #10b981;
+    --c-red: #ef4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+    font-family: -apple-system, "PingFang SC", "Helvetica Neue", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    background: #000;
+    color: #fff;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #stage {
+    position: relative;
+    width: 1080px;
+    height: 1920px;
+    background: linear-gradient(135deg, var(--c-bg-from) 0%, var(--c-bg-via) 50%, var(--c-bg-to) 100%);
+    overflow: hidden;
+  }
+
+  /* 背景光晕 — 注意: 不用 CSS animation, 否则 puppeteer 截到的状态不可控
+     改为 JS 每帧手动设位置 */
+  .halo {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  .halo-1 { width: 800px; height: 800px; top: -200px; left: -200px; background: rgba(168, 85, 247, 0.35); }
+  .halo-2 { width: 700px; height: 700px; bottom: -150px; right: -150px; background: rgba(236, 72, 153, 0.3); }
+  .halo-3 { width: 600px; height: 600px; top: 40%; left: 30%; background: rgba(96, 165, 250, 0.25); }
+
+  /* ============ 共用场景容器 ============ */
+  /* 关键: 默认 display:none, 由 JS 切到 flex. 不用 opacity transition */
+  .scene {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 200px 80px 100px;
+  }
+  .scene.show { display: flex; }
+
+  /* ============ 顶部品牌徽章 ============ */
+  .brand-chip {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 32px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    backdrop-filter: blur(20px);
+    color: #d8b4fe;
+    font-size: 30px;
+    font-weight: 500;
+    z-index: 10;
+  }
+  .brand-chip.show { display: flex; }
+  .brand-chip svg { width: 32px; height: 32px; }
+
+  /* ============ 通用文字 ============ */
+  .h1 {
+    font-size: 130px;
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-align: center;
+    background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.7) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .h1-gradient {
+    background: linear-gradient(135deg, var(--c-purple) 0%, var(--c-pink) 50%, var(--c-blue) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .h2 {
+    font-size: 76px;
+    font-weight: 800;
+    line-height: 1.1;
+    text-align: center;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+  .sub {
+    font-size: 38px;
+    line-height: 1.4;
+    text-align: center;
+    color: rgba(255,255,255,0.65);
+    margin-top: 24px;
+    max-width: 900px;
+  }
+
+  /* ============ Scene 1: Hook 痛点 ============ */
+  #scene-1 .pain-num {
+    font-size: 280px;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--c-red) 0%, #ff6b9d 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    line-height: 1;
+    text-shadow: 0 0 80px rgba(239, 68, 68, 0.4);
+  }
+  #scene-1 .pain-label {
+    font-size: 56px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 30px;
+  }
+  #scene-1 .pain-desc {
+    font-size: 36px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  /* ============ Scene 2: Solution Reveal ============ */
+  #scene-2 .badge {
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--c-purple);
+    padding: 12px 32px;
+    border: 2px solid rgba(192, 132, 252, 0.4);
+    border-radius: 999px;
+    margin-bottom: 50px;
+    backdrop-filter: blur(10px);
+  }
+  #scene-2 .gap { height: 24px; }
+
+  /* ============ Scene 3: Demo (Phone Mockup) ============ */
+  .phone {
+    position: relative;
+    width: 540px;
+    height: 1100px;
+    background: #1a1a1a;
+    border-radius: 60px;
+    border: 8px solid #333;
+    box-shadow: 0 60px 120px rgba(0,0,0,0.6), 0 0 100px rgba(168, 85, 247, 0.2);
+    overflow: hidden;
+    margin: 60px 0;
+  }
+  .phone-screen {
+    position: absolute;
+    inset: 0;
+    border-radius: 50px;
+    overflow: hidden;
+    background: #000;
+  }
+  .phone-notch {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 28px;
+    background: #000;
+    border-radius: 14px;
+    z-index: 10;
+  }
+
+  /* 三个 mock 默认 display:none, JS 控制 */
+  .mock {
+    position: absolute;
+    inset: 0;
+    display: none;
+  }
+  .mock.show { display: flex; }
+
+  /* Mock template - classic (centered card) */
+  .mock-classic {
+    background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+    color: white;
+  }
+  .mock-classic .icon {
+    width: 140px;
+    height: 140px;
+    background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 70px;
+    margin-bottom: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .mock-classic .app-name { font-size: 36px; font-weight: 700; margin-bottom: 10px; }
+  .mock-classic .app-desc { font-size: 22px; opacity: 0.8; text-align: center; line-height: 1.4; }
+  .mock-classic .install-btn {
+    margin-top: 40px;
+    padding: 18px 60px;
+    background: linear-gradient(90deg, #a855f7, #ec4899, #3b82f6);
+    background-size: 200% 100%;
+    background-position: 0% 50%;
+    border-radius: 16px;
+    font-size: 28px;
+    font-weight: 700;
+    box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+  }
+
+  /* Mock template - playstore */
+  .mock-playstore {
+    background: white;
+    color: #333;
+    padding: 40px 30px;
+    flex-direction: column;
+  }
+  .mock-playstore .header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .mock-playstore .pl-logo {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #00d873 0%, #ffce00 100%);
+    border-radius: 4px;
+  }
+  .mock-playstore .pl-text { font-size: 22px; color: #444; }
+  .mock-playstore .app-row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 30px;
+  }
+  .mock-playstore .app-icon {
+    width: 100px; height: 100px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px;
+    color: white;
+  }
+  .mock-playstore .app-info { flex: 1; }
+  .mock-playstore .ps-name { font-size: 28px; font-weight: 600; color: #111; }
+  .mock-playstore .ps-dev { font-size: 18px; color: #1b6f47; font-weight: 500; margin-top: 4px; }
+  .mock-playstore .ps-stats {
+    display: flex;
+    margin-top: 30px;
+    padding: 16px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+  }
+  .mock-playstore .ps-stat {
+    flex: 1;
+    text-align: center;
+    font-size: 20px;
+  }
+  .mock-playstore .ps-stat .val { font-weight: 600; color: #111; font-size: 22px; }
+  .mock-playstore .ps-stat .lbl { color: #888; font-size: 14px; margin-top: 4px; }
+  .mock-playstore .ps-install {
+    margin-top: 24px;
+    width: 100%;
+    height: 60px;
+    background: #1b6f47;
+    color: white;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  /* Mock template - floating */
+  .mock-floating {
+    background: linear-gradient(180deg, #ec4899 0%, #8b5cf6 50%, #1e293b 100%);
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px 40px;
+    position: absolute;
+  }
+  .mock-floating .float-icon {
+    position: absolute;
+    top: 200px; left: 50%;
+    transform: translateX(-50%);
+    width: 180px; height: 180px;
+    background: linear-gradient(135deg, #fff, #e9d5ff);
+    border-radius: 40px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 90px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+  }
+  .mock-floating .float-btn {
+    margin: 0 auto;
+    width: 90%;
+    padding: 24px 0;
+    background: linear-gradient(90deg, #a855f7, #ec4899, #3b82f6);
+    background-size: 200% 100%;
+    background-position: 0% 50%;
+    border-radius: 24px;
+    font-size: 30px;
+    font-weight: 700;
+    text-align: center;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+    color: white;
+  }
+
+  .template-label {
+    margin-top: 30px;
+    font-size: 38px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.05em;
+  }
+
+  /* ============ Scene 4: PWA + APK ============ */
+  .feature-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 70px;
+    width: 100%;
+    max-width: 920px;
+  }
+  .feature-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 32px;
+    padding: 60px 40px;
+    text-align: center;
+    backdrop-filter: blur(20px);
+  }
+  .feature-card .icon-box {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 30px;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+  }
+  .feature-card .ic-pwa {
+    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    box-shadow: 0 20px 50px rgba(168, 85, 247, 0.4);
+  }
+  .feature-card .ic-apk {
+    background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+    box-shadow: 0 20px 50px rgba(16, 185, 129, 0.4);
+  }
+  .feature-card .ft-name { font-size: 48px; font-weight: 800; margin-bottom: 16px; }
+  .feature-card .ft-desc { font-size: 28px; color: rgba(255,255,255,0.65); line-height: 1.4; }
+
+  /* ============ Scene 5: Pixel platforms ============ */
+  .pixel-row {
+    display: flex;
+    gap: 40px;
+    margin-top: 80px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .pixel-logo {
+    width: 200px;
+    height: 200px;
+    border-radius: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    font-weight: 900;
+  }
+  .pixel-logo .label {
+    font-size: 26px;
+    margin-top: 12px;
+    opacity: 0.9;
+    font-weight: 600;
+  }
+  .pl-fb { background: linear-gradient(135deg, #1877f2 0%, #0d5fb8 100%); color: white; box-shadow: 0 20px 50px rgba(24, 119, 242, 0.4); }
+  .pl-tt { background: linear-gradient(135deg, #ff0050 0%, #25f4ee 100%); color: white; box-shadow: 0 20px 50px rgba(255, 0, 80, 0.4); }
+  .pl-kw { background: linear-gradient(135deg, #ff5400 0%, #ff8c00 100%); color: white; box-shadow: 0 20px 50px rgba(255, 84, 0, 0.4); }
+
+  /* ============ Scene 6: Social Proof ============ */
+  .proof-num {
+    font-size: 240px;
+    font-weight: 900;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--c-purple) 0%, var(--c-pink) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .proof-label {
+    font-size: 52px;
+    font-weight: 700;
+    margin-top: 24px;
+    color: #fff;
+  }
+  .proof-sub {
+    font-size: 32px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 16px;
+    text-align: center;
+  }
+  .badges {
+    display: flex;
+    gap: 24px;
+    margin-top: 70px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .badge-pill {
+    padding: 18px 32px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    font-size: 28px;
+    color: rgba(255,255,255,0.85);
+    backdrop-filter: blur(10px);
+  }
+
+  /* ============ Scene 7: Final CTA ============ */
+  #scene-7 {
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%);
+  }
+  .cta-url {
+    font-size: 90px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, #d8b4fe 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.02em;
+    text-shadow: 0 0 60px rgba(168, 85, 247, 0.4);
+    margin-top: 80px;
+  }
+  .cta-action {
+    margin-top: 60px;
+    padding: 30px 80px;
+    background: linear-gradient(90deg, #a855f7, #ec4899, #3b82f6);
+    background-size: 200% 100%;
+    background-position: 0% 50%;
+    border-radius: 999px;
+    font-size: 42px;
+    font-weight: 800;
+    box-shadow: 0 30px 80px rgba(168, 85, 247, 0.5);
+    color: white;
+  }
+  .footer-brand {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 32px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 500;
+  }
+  #scene-7 .footer-brand { display: flex; }
+
+  /* Pixel ping circles */
+  .ping {
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 4px solid rgba(74, 222, 128, 0.8);
+    pointer-events: none;
+  }
+
+  #frame-info {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.3);
+    font-family: monospace;
+    z-index: 100;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div class="halo halo-1" id="halo-1"></div>
+  <div class="halo halo-2" id="halo-2"></div>
+  <div class="halo halo-3" id="halo-3"></div>
+
+  <div class="brand-chip" id="brand-chip">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/></svg>
+    <span data-zh="ipcloak.ai · W2A 生成器" data-en="ipcloak.ai · W2A Generator">ipcloak.ai · W2A 生成器</span>
+  </div>
+
+  <!-- Scene 1: 痛点 -->
+  <div class="scene" id="scene-1">
+    <div class="pain-num" id="pain-num">0</div>
+    <div class="pain-label" data-zh="落地页跳出率" data-en="Landing Page Bounce Rate">落地页跳出率</div>
+    <div class="pain-desc" data-zh="你的广告预算正在被一次性流失" data-en="Your ad budget is bleeding out, one click at a time">你的广告预算正在被一次性流失</div>
+  </div>
+
+  <!-- Scene 2: 方案 Reveal -->
+  <div class="scene" id="scene-2">
+    <div class="badge" data-zh="✨ 解决方案" data-en="✨ The Solution">✨ 解决方案</div>
+    <div class="h1" data-zh="W2A" data-en="W2A">W2A</div>
+    <div class="gap"></div>
+    <div class="h1 h1-gradient" data-zh="一键生成 App" data-en="One-Click to App">一键生成 App</div>
+    <div class="sub" data-zh="把任何网站秒变可安装的应用" data-en="Turn any website into an installable app in seconds">把任何网站秒变可安装的应用</div>
+  </div>
+
+  <!-- Scene 3: Demo -->
+  <div class="scene" id="scene-3">
+    <div class="h2" data-zh="3 套精美模板" data-en="3 Beautiful Templates">3 套精美模板</div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="mock mock-classic" id="mock-1">
+          <div class="icon">🚀</div>
+          <div class="app-name" data-zh="我的应用" data-en="My App">我的应用</div>
+          <div class="app-desc" data-zh="一款让你爱不释手的应用" data-en="An app you'll fall in love with">一款让你爱不释手的应用</div>
+          <div class="install-btn" data-zh="安装到桌面" data-en="Add to Home Screen">安装到桌面</div>
+        </div>
+        <div class="mock mock-playstore" id="mock-2">
+          <div class="header">
+            <div class="pl-logo"></div>
+            <div class="pl-text">Google Play</div>
+          </div>
+          <div class="app-row">
+            <div class="app-icon">🎮</div>
+            <div class="app-info">
+              <div class="ps-name" data-zh="经典游戏" data-en="Classic Game">经典游戏</div>
+              <div class="ps-dev">yoursite.com</div>
+            </div>
+          </div>
+          <div class="ps-stats">
+            <div class="ps-stat"><div class="val">4.9★</div><div class="lbl" data-zh="2M 评价" data-en="2M reviews">2M 评价</div></div>
+            <div class="ps-stat"><div class="val">10M+</div><div class="lbl" data-zh="下载量" data-en="downloads">下载量</div></div>
+            <div class="ps-stat"><div class="val">3+</div><div class="lbl" data-zh="分级" data-en="age rating">分级</div></div>
+          </div>
+          <div class="ps-install" data-zh="安装" data-en="Install">安装</div>
+        </div>
+        <div class="mock mock-floating" id="mock-3">
+          <div class="float-icon">✨</div>
+          <div class="float-btn" data-zh="立即安装" data-en="Install Now">立即安装</div>
+        </div>
+      </div>
+    </div>
+    <div class="template-label" id="template-label">经典模板</div>
+  </div>
+
+  <!-- Scene 4: PWA + APK -->
+  <div class="scene" id="scene-4">
+    <div class="h2" data-zh="PWA + APK 双分发" data-en="PWA + APK Dual Distribution">PWA + APK 双分发</div>
+    <div class="sub" data-zh="一份配置, 两种安装方式, 全平台通吃" data-en="One config, two install paths, every platform covered">一份配置, 两种安装方式, 全平台通吃</div>
+    <div class="feature-grid-2">
+      <div class="feature-card">
+        <div class="icon-box ic-pwa">📲</div>
+        <div class="ft-name">PWA</div>
+        <div class="ft-desc" data-zh="无需商店审核<br/>添加到主屏幕" data-en="No app store review<br/>Add to home screen">无需商店审核<br/>添加到主屏幕</div>
+      </div>
+      <div class="feature-card">
+        <div class="icon-box ic-apk">📦</div>
+        <div class="ft-name">APK</div>
+        <div class="ft-desc" data-zh="原生安装包<br/>一键下载安装" data-en="Native install<br/>One-tap download">原生安装包<br/>一键下载安装</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 5: Pixel -->
+  <div class="scene" id="scene-5">
+    <div class="h2" data-zh="像素跟踪 · 自动回传" data-en="Pixel Tracking · Auto Postback">像素跟踪 · 自动回传</div>
+    <div class="sub" data-zh="安装成功事件直传广告平台, 反哺投放算法" data-en="Install events fire straight to ad platforms, feeding optimization">安装成功事件直传广告平台, 反哺投放算法</div>
+    <div class="pixel-row" id="pixel-row">
+      <div class="pixel-logo pl-fb" id="px-fb">
+        <span>f</span>
+        <span class="label">Facebook</span>
+      </div>
+      <div class="pixel-logo pl-tt" id="px-tt">
+        <span>♪</span>
+        <span class="label">TikTok</span>
+      </div>
+      <div class="pixel-logo pl-kw" id="px-kw">
+        <span>K</span>
+        <span class="label">Kwai</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 6: Social proof -->
+  <div class="scene" id="scene-6">
+    <div class="proof-num" id="proof-num">0</div>
+    <div class="proof-label" data-zh="投流人正在使用" data-en="performance marketers onboard">投流人正在使用</div>
+    <div class="proof-sub" data-zh="跨境 · 仿牌 · iGaming · BC · 工具类全场景适用" data-en="DTC · cross-border · iGaming · tools — all use cases">跨境 · 仿牌 · iGaming · BC · 工具类全场景适用</div>
+    <div class="badges">
+      <div class="badge-pill" data-zh="🚀 Cloudflare 全球加速" data-en="🚀 Cloudflare Global">🚀 Cloudflare 全球加速</div>
+      <div class="badge-pill" data-zh="⚡ 秒级生成" data-en="⚡ Generated in seconds">⚡ 秒级生成</div>
+      <div class="badge-pill" data-zh="🎁 完全免费" data-en="🎁 Free forever">🎁 完全免费</div>
+    </div>
+  </div>
+
+  <!-- Scene 7: CTA -->
+  <div class="scene" id="scene-7">
+    <div class="h2" data-zh="现在就开始" data-en="Get Started Now">现在就开始</div>
+    <div class="cta-url">pwa.ipcloak.ai</div>
+    <div class="cta-action" data-zh="免费使用 →" data-en="Start Free →">免费使用 →</div>
+    <div class="footer-brand">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/></svg>
+      IPCloak.AI · 爱普出海
+    </div>
+  </div>
+
+  <div id="frame-info">frame: <span id="f-num">0</span> / time: <span id="f-time">0.00</span>s</div>
+</div>
+
+<script>
+  // ================================================
+  // 时间轴 (秒)
+  // ================================================
+  const TOTAL = 25.0;
+  const FPS = 60;
+
+  const TIMELINE = [
+    { id: 'scene-1', start: 0.0,  end: 2.5,  brand: false },
+    { id: 'scene-2', start: 2.55, end: 5.0,  brand: true },
+    { id: 'scene-3', start: 5.05, end: 9.0,  brand: true },
+    { id: 'scene-4', start: 9.05, end: 13.0, brand: true },
+    { id: 'scene-5', start: 13.05, end: 17.0, brand: true },
+    { id: 'scene-6', start: 17.05, end: 21.0, brand: true },
+    { id: 'scene-7', start: 21.05, end: 25.0, brand: false },
+  ];
+
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  // 主函数: 给定时间, 同步全部 DOM 状态
+  function setTime(t) {
+    // 1. 找到当前场景, 显示它, 隐藏其他
+    let active = null;
+    TIMELINE.forEach(s => {
+      const el = document.getElementById(s.id);
+      const inRange = t >= s.start && t <= s.end;
+      if (inRange) {
+        active = s;
+        if (!el.classList.contains('show')) el.classList.add('show');
+      } else {
+        if (el.classList.contains('show')) el.classList.remove('show');
+      }
+    });
+
+    // 2. 品牌徽章
+    const brand = document.getElementById('brand-chip');
+    if (active && active.brand) brand.classList.add('show');
+    else brand.classList.remove('show');
+
+    // 3. 背景光晕 — 用 transform 而不是 CSS animation, 这样每帧位置可控
+    const haloPhase = t / 8; // 8s 周期
+    const sin1 = Math.sin(haloPhase * 2 * Math.PI);
+    const cos1 = Math.cos(haloPhase * 2 * Math.PI);
+    document.getElementById('halo-1').style.transform = `translate(${sin1 * 50}px, ${cos1 * 80}px) scale(${1 + sin1 * 0.1})`;
+    document.getElementById('halo-2').style.transform = `translate(${-cos1 * 60}px, ${-sin1 * 50}px) scale(${1 + cos1 * 0.15})`;
+    document.getElementById('halo-3').style.transform = `translate(${sin1 * 80}px, ${-cos1 * 40}px) scale(${1 + sin1 * 0.05})`;
+
+    if (!active) return;
+    const sceneT = (t - active.start) / (active.end - active.start);
+
+    // ---- 各场景的进入/离开动画手动控制 ----
+    if (active.id === 'scene-1') {
+      const p = easeOut(Math.min(sceneT * 1.5, 1));
+      document.getElementById('pain-num').textContent = Math.floor(lerp(0, 80, p)) + '%';
+    }
+
+    if (active.id === 'scene-3') {
+      // 三个 mock 各占 1/3, 互相切换
+      const phase = sceneT * 3;
+      const idx = Math.min(Math.floor(phase), 2);
+      for (let i = 1; i <= 3; i++) {
+        const m = document.getElementById('mock-' + i);
+        if (i - 1 === idx) m.classList.add('show');
+        else m.classList.remove('show');
+      }
+      const labels = {
+        zh: ['经典模板', 'Google Play 风格', '大图悬浮按钮'],
+        en: ['Classic', 'Google Play Style', 'Hero + Floating']
+      };
+      document.getElementById('template-label').textContent = labels[CURRENT_LANG][idx];
+
+      // 按钮渐变流动 — 手动 lerp background-position
+      const flowPct = (t * 100) % 200;
+      document.querySelectorAll('.mock-classic .install-btn, .mock-floating .float-btn').forEach(b => {
+        b.style.backgroundPosition = `${flowPct}% 50%`;
+      });
+    }
+
+    if (active.id === 'scene-5') {
+      // Pixel logo 弹出 — 用 transform scale 直接 lerp
+      const bumps = [
+        { id: 'px-fb', delay: 0.1 },
+        { id: 'px-tt', delay: 0.25 },
+        { id: 'px-kw', delay: 0.4 },
+      ];
+      bumps.forEach(b => {
+        const localT = (sceneT - b.delay) / 0.3;
+        const el = document.getElementById(b.id);
+        if (localT <= 0) {
+          el.style.transform = 'scale(0)';
+          el.style.opacity = '0';
+        } else if (localT >= 1) {
+          el.style.transform = 'scale(1)';
+          el.style.opacity = '1';
+        } else {
+          // 弹簧效果: t<0.7 时放大到 1.1, 然后回弹到 1
+          const tt = easeOut(localT);
+          const scale = tt < 0.7 ? lerp(0, 1.15, tt / 0.7) : lerp(1.15, 1, (tt - 0.7) / 0.3);
+          el.style.transform = `scale(${scale})`;
+          el.style.opacity = '1';
+        }
+      });
+
+      // Ping 波纹: 在 60-95% 进度时, 围绕 3 个 logo 各画一圈逐渐扩张的环
+      const overlay = document.getElementById('pixel-row');
+      // 先清掉所有 ping
+      overlay.querySelectorAll('.ping').forEach(p => p.remove());
+      if (sceneT > 0.65 && sceneT < 0.98) {
+        const pingT = (sceneT - 0.65) / 0.33;
+        const scale = lerp(0.9, 1.8, pingT);
+        const opacity = lerp(1, 0, pingT);
+        ['px-fb', 'px-tt', 'px-kw'].forEach(pid => {
+          const target = document.getElementById(pid);
+          const ping = document.createElement('div');
+          ping.className = 'ping';
+          ping.style.transform = `scale(${scale})`;
+          ping.style.opacity = opacity;
+          target.appendChild(ping);
+          ping.style.position = 'absolute';
+          ping.style.left = '0';
+          ping.style.top = '0';
+        });
+      }
+    }
+
+    if (active.id === 'scene-6') {
+      const p = easeOut(Math.min(sceneT * 1.5, 1));
+      const n = Math.floor(lerp(0, 3000, p));
+      document.getElementById('proof-num').textContent = n.toLocaleString() + '+';
+    }
+
+    if (active.id === 'scene-7') {
+      // CTA 按钮渐变流动
+      const flowPct = (t * 100) % 200;
+      const cta = document.querySelector('.cta-action');
+      if (cta) cta.style.backgroundPosition = `${flowPct}% 50%`;
+    }
+  }
+
+  // ================================================
+  // 语言 (URL hash: #zh / #en)
+  // ================================================
+  let CURRENT_LANG = location.hash === '#en' ? 'en' : 'zh';
+  document.querySelectorAll('[data-zh]').forEach(el => {
+    const txt = CURRENT_LANG === 'en' ? el.dataset.en : el.dataset.zh;
+    if (txt.includes('<')) el.innerHTML = txt;
+    else el.textContent = txt;
+  });
+
+  // ================================================
+  // Puppeteer 接口
+  // ================================================
+  window.__setFrame = function(frameIdx) {
+    const t = frameIdx / FPS;
+    setTime(t);
+    document.getElementById('f-num').textContent = frameIdx;
+    document.getElementById('f-time').textContent = t.toFixed(2);
+    return { time: t, scene: TIMELINE.find(s => t >= s.start && t <= s.end)?.id };
+  };
+  window.__totalFrames = Math.ceil(TOTAL * FPS);
+  window.__fps = FPS;
+  window.__totalSeconds = TOTAL;
+
+  // 浏览器直接打开 → 自动播放预览
+  if (!window.__puppeteerControlled) {
+    const start = Date.now();
+    function tick() {
+      const now = (Date.now() - start) / 1000;
+      const idx = Math.min(Math.floor(now * FPS), window.__totalFrames);
+      setTime(idx / FPS);
+      document.getElementById('f-num').textContent = idx;
+      document.getElementById('f-time').textContent = (idx / FPS).toFixed(2);
+      if (now < TOTAL) requestAnimationFrame(tick);
+      else setTimeout(() => window.location.reload(), 500);
+    }
+    document.getElementById('frame-info').style.display = 'block';
+    tick();
+  }
+</script>
+
+</body>
+</html>

@@ -6,3 +6,6 @@ node_modules
 .env*.local
 .deploy.env
 data/apps.json
+
+# Video pipeline output (1500+ PNG frames + large mp4)
+scripts/video/dist/

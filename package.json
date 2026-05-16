@@ -9,7 +9,11 @@
     "preview": "wrangler pages dev .vercel/output/static --compatibility-flag=nodejs_compat",
     "deploy": "./deploy.sh",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "video:zh": "node scripts/video/record.js zh && bash scripts/video/build.sh zh",
+    "video:en": "node scripts/video/record.js en && bash scripts/video/build.sh en",
+    "video": "npm run video:zh && npm run video:en",
+    "video:preview": "open scripts/video/promo.html"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -32,6 +36,7 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "puppeteer": "^25.0.2",
     "tailwindcss": "^4",
     "typescript": "^5",
     "wrangler": "^4.90.0"
