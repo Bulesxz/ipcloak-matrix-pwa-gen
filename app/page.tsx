@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, Smartphone, Sparkles, Loader2, Activity, Languages, PlusCircle } from 'lucide-react';
 import { dict, type Dict } from '@/lib/i18n';
+import { CASES } from '@/lib/cases';
 
 type SiteLang = 'zh' | 'en';
 
@@ -205,6 +207,58 @@ export default function Home() {
               </div>
               <h3 className="font-semibold text-white">{t.siteFeature3}</h3>
               <p className="text-sm text-neutral-400">{t.siteFeature3Desc}</p>
+            </div>
+          </div>
+
+          {/* ============ 行业案例 strip ============ */}
+          <div className="pt-20 pb-8">
+            <div className="flex items-end justify-between mb-6 max-w-5xl mx-auto">
+              <div className="text-left">
+                <div className="text-xs text-purple-300 font-medium uppercase tracking-wider mb-2">
+                  📚 {lang === 'zh' ? '行业案例' : 'Use Cases'}
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-white">
+                  {lang === 'zh' ? '看看同行怎么用' : 'See how others use it'}
+                </h2>
+              </div>
+              <Link
+                href="/cases"
+                className="hidden md:inline-flex items-center gap-1.5 text-sm text-purple-300 hover:text-white transition-colors"
+              >
+                {lang === 'zh' ? '全部 5 个案例' : 'All 5 cases'}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 max-w-5xl mx-auto">
+              {CASES.map(c => (
+                <Link
+                  key={c.slug}
+                  href={`/cases/${c.slug}`}
+                  className="group relative bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-4 hover:bg-white/10 hover:border-white/20 transition-all overflow-hidden"
+                >
+                  <div className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${c.accentColor} opacity-70`} />
+                  <div className="text-3xl mb-2">{c.emoji}</div>
+                  <div className="text-xs font-semibold text-white mb-1 line-clamp-1">
+                    {lang === 'zh' ? c.industry.zh : c.industry.en}
+                  </div>
+                  <div className="text-[10px] text-neutral-400 line-clamp-2 leading-relaxed">
+                    {lang === 'zh' ? c.tagline.zh : c.tagline.en}
+                  </div>
+                  <ArrowRight className="w-3 h-3 text-neutral-500 group-hover:text-white absolute top-3 right-3 transition-colors" />
+                </Link>
+              ))}
+            </div>
+
+            {/* 移动端的"查看全部" */}
+            <div className="md:hidden text-center mt-6">
+              <Link
+                href="/cases"
+                className="inline-flex items-center gap-1.5 text-sm text-purple-300"
+              >
+                {lang === 'zh' ? '查看全部 5 个案例' : 'See all 5 cases'}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
         </div>
