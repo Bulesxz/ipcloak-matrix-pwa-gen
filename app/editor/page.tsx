@@ -51,6 +51,7 @@ interface AppConfig {
     heroImage?: string;
     distribution?: Distribution;
     apkUrl?: string;
+    targetUrl?: string;
     buttonColor?: ButtonColor;
     customButtonColor?: string;
 }
@@ -225,6 +226,33 @@ export default function Editor() {
                             <Label htmlFor="name">{t.editorAppName}</Label>
                             <Input id="name" value={config.name} onChange={(e) => handleChange('name', e.target.value)} />
                         </div>
+
+                        <div className="grid w-full items-center gap-1.5">
+                            <Label htmlFor="url">
+                                {uiLang === 'zh' ? '扫站源 URL (抓取 manifest/icon 用)' : 'Source URL (for scanning manifest/icon)'}
+                            </Label>
+                            <Input id="url" value={config.url} onChange={(e) => handleChange('url', e.target.value)} placeholder="https://example.com" />
+                        </div>
+
+                        {/* PWA 模式才显示 targetUrl 字段 (APK 模式有自己的 apkUrl) */}
+                        {config.distribution !== 'apk' && (
+                            <div className="grid w-full items-center gap-1.5">
+                                <Label htmlFor="targetUrl">
+                                    {uiLang === 'zh' ? '目标地址 (PWA 启动时打开, 留空走源 URL)' : 'Target URL (opens on PWA launch, fallback to source)'}
+                                </Label>
+                                <Input
+                                    id="targetUrl"
+                                    value={config.targetUrl || ''}
+                                    onChange={(e) => handleChange('targetUrl', e.target.value)}
+                                    placeholder={config.url || 'https://example.com/lp/promo?utm_source=pwa'}
+                                />
+                                <p className="text-[11px] text-neutral-500">
+                                    {uiLang === 'zh'
+                                        ? '常用: 让 PWA 直接打开带广告参数的落地页, 跟扫站源 URL 解耦'
+                                        : 'Use case: open a specific landing page with UTM params, decoupled from scan source'}
+                                </p>
+                            </div>
+                        )}
 
                         <div className="grid w-full items-center gap-1.5">
                             <Label htmlFor="description">{t.editorDesc}</Label>
@@ -680,6 +708,7 @@ export default function Editor() {
                             if (config.description) p.set('desc', config.description);
                             if (config.iconUrl) p.set('icon', config.iconUrl);
                             if (config.url) p.set('url', config.url);
+                            if (config.targetUrl) p.set('target', config.targetUrl);
                             if (config.backgroundColor) p.set('bg', config.backgroundColor);
                             if (config.template) p.set('t', config.template);
                             if (config.language) p.set('l', config.language);

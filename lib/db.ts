@@ -46,7 +46,11 @@ export interface AppReviews {
 
 export interface AppConfig {
   id?: string;
+  /** 扫站源 URL: 用来抓 manifest/icon/meta. 也是兜底 start_url (targetUrl 留空时) */
   url: string;
+  /** ⭐ PWA 启动后实际打开的目标 URL. 留空时 fallback 到 url.
+   *  适用: 扫 https://meto.asia 拿素材, 但 PWA 装好后打开 https://meto.asia/lp/promo?utm_source=pwa */
+  targetUrl?: string;
   name: string;
   description: string;
   iconUrl: string;

@@ -13,9 +13,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
         return new Response('Not Found', { status: 404 });
     }
 
-    // ⭐ start_url = 用户真正想让 PWA 打开的目标网站 (app.url)
-    //   留空时 fallback 到 install 页本身 (至少能打开, 不报错)
-    const startUrl = app.url?.trim() || `/install/${id}`;
+    // ⭐ start_url 优先级: targetUrl > url > install 页
+    //   targetUrl 是 PWA 装到桌面后点图标真正打开的地址
+    //   url 是用来扫站的源, 跟 targetUrl 可不一样
+    const startUrl = app.targetUrl?.trim() || app.url?.trim() || `/install/${id}`;
 
     const manifest = {
         name: app.name,

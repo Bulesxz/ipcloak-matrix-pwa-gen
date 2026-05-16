@@ -45,7 +45,7 @@ export default function ClassicTemplate({ app }: { app: AppConfig }) {
                             buttonStyle={bs.style}
                         />
                     )}
-                    <Link href={app.url} target="_blank" className="block">
+                    <Link href={app.targetUrl?.trim() || app.url} target="_blank" className="block">
                         <div className="text-sm opacity-60 hover:opacity-100 flex items-center justify-center gap-1 mt-4 transition-opacity">
                             {t(lang, 'openWebsite')} <ArrowUpRight className="w-3 h-3" />
                         </div>

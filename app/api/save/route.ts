@@ -67,6 +67,7 @@ export async function POST(request: Request) {
         const savedApp = await db.saveApp({
             id: typeof body.id === 'string' ? body.id : undefined,
             url: String(body.url).slice(0, 2000),
+            targetUrl: typeof body.targetUrl === 'string' && body.targetUrl.trim() ? String(body.targetUrl).slice(0, 2000) : undefined,
             name: String(body.name).slice(0, 200),
             description: String(body.description || '').slice(0, 1000),
             iconUrl: String(body.iconUrl || '').slice(0, 2000),

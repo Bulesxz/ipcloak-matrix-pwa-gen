@@ -51,6 +51,7 @@ function buildConfig(sp: SearchParams): AppConfig {
     return {
         id: 'quick-' + Math.random().toString(36).slice(2, 10),  // 临时 ID 给 PixelTracker 用
         url: pickStr(sp.url) || pickStr(sp.u) || 'https://example.com',
+        targetUrl: pickStr(sp.target),
         name: pickStr(sp.name) || pickStr(sp.n) || 'My App',
         description: pickStr(sp.desc) || pickStr(sp.description) || '',
         iconUrl: pickStr(sp.icon) || pickStr(sp.i) || '',
