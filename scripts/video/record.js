@@ -19,13 +19,13 @@ const FRAMES_DIR = path.join(__dirname, 'dist', `frames-${LANG}`);
 
 const WIDTH = 1080;
 const HEIGHT = 1920;
-const FPS = 60;
-const DURATION = 25.0; // 秒
-const TOTAL_FRAMES = Math.ceil(DURATION * FPS); // 1500
+// FPS / DURATION 由 promo.html 通过 window.__fps / window.__totalSeconds 决定 (HTML 是唯一真相)
+// 此处仅作 fallback
+const DEFAULT_FPS = 60;
+const DEFAULT_DURATION = 30.0;
 
 async function main() {
   console.log(`🎬 Recording ${LANG.toUpperCase()} version`);
-  console.log(`   ${TOTAL_FRAMES} frames @ ${FPS}fps = ${DURATION}s`);
   console.log(`   ${WIDTH}x${HEIGHT}`);
 
   // 清空旧帧
@@ -63,11 +63,21 @@ async function main() {
   await page.evaluate(() => document.fonts.ready);
   await new Promise(r => setTimeout(r, 500));
 
-  // 检查 __setFrame 是否存在
-  const hasController = await page.evaluate(() => typeof window.__setFrame === 'function');
-  if (!hasController) {
+  // 检查 __setFrame 是否存在 + 从 HTML 取 FPS / TotalFrames
+  const meta = await page.evaluate(() => {
+    if (typeof window.__setFrame !== 'function') return null;
+    return {
+      fps: window.__fps || 60,
+      totalSeconds: window.__totalSeconds || 30,
+      totalFrames: window.__totalFrames || Math.ceil((window.__totalSeconds || 30) * (window.__fps || 60)),
+    };
+  });
+  if (!meta) {
     throw new Error('window.__setFrame not exposed — check promo.html script tag');
   }
+  const FPS = meta.fps;
+  const TOTAL_FRAMES = meta.totalFrames;
+  console.log(`   ${TOTAL_FRAMES} frames @ ${FPS}fps = ${meta.totalSeconds}s (from HTML)`);
 
   console.log(`📸 Capturing frames...`);
   const t0 = Date.now();

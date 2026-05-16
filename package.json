@@ -10,9 +10,13 @@
     "deploy": "./deploy.sh",
     "start": "next start",
     "lint": "next lint",
-    "video:zh": "node scripts/video/record.js zh && bash scripts/video/build.sh zh",
-    "video:en": "node scripts/video/record.js en && bash scripts/video/build.sh en",
+    "video:zh": "node scripts/video/record.js zh && python3 scripts/video/tts.py zh && bash scripts/video/build.sh zh",
+    "video:en": "node scripts/video/record.js en && python3 scripts/video/tts.py en && bash scripts/video/build.sh en",
     "video": "npm run video:zh && npm run video:en",
+    "video:tts:zh": "python3 scripts/video/tts.py zh",
+    "video:tts:en": "python3 scripts/video/tts.py en",
+    "video:tts:zh:edge": "python3 scripts/video/tts.py zh --engine edge-tts --proxy http://127.0.0.1:7897",
+    "video:tts:en:edge": "python3 scripts/video/tts.py en --engine edge-tts --proxy http://127.0.0.1:7897",
     "video:preview": "open scripts/video/promo.html"
   },
   "dependencies": {

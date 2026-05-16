@@ -637,20 +637,46 @@
 
 <script>
   // ================================================
-  // 时间轴 (秒)
+  // 时间轴 (秒) — 30s 版本, 含 TTS 旁白
   // ================================================
-  const TOTAL = 25.0;
+  const TOTAL = 30.0;
   const FPS = 60;
 
   const TIMELINE = [
-    { id: 'scene-1', start: 0.0,  end: 2.5,  brand: false },
-    { id: 'scene-2', start: 2.55, end: 5.0,  brand: true },
-    { id: 'scene-3', start: 5.05, end: 9.0,  brand: true },
-    { id: 'scene-4', start: 9.05, end: 13.0, brand: true },
-    { id: 'scene-5', start: 13.05, end: 17.0, brand: true },
-    { id: 'scene-6', start: 17.05, end: 21.0, brand: true },
-    { id: 'scene-7', start: 21.05, end: 25.0, brand: false },
+    { id: 'scene-1', start: 0.0,   end: 3.0,  brand: false },
+    { id: 'scene-2', start: 3.05,  end: 6.5,  brand: true },
+    { id: 'scene-3', start: 6.55,  end: 11.0, brand: true },
+    { id: 'scene-4', start: 11.05, end: 15.5, brand: true },
+    { id: 'scene-5', start: 15.55, end: 20.0, brand: true },
+    { id: 'scene-6', start: 20.05, end: 24.0, brand: true },
+    { id: 'scene-7', start: 24.05, end: 30.0, brand: false },
   ];
+
+  // ================================================
+  // 旁白脚本 — TTS 生成器 (scripts/video/tts.py) 读取这个数组
+  //   t        起始毫秒 (绝对时间)
+  //   duration 这段旁白允许的最长时长 (毫秒), 超出会被 atempo 加速
+  //   zh / en  中英文旁白
+  // ================================================
+  const SCRIPT = [
+    { t:   500, duration: 2400, zh: '你的落地页跳出率高达八成？广告预算正在一次次流失。',
+                                en: 'Your landing page bounce rate is eighty percent? Your ad budget is bleeding out.' },
+    { t:  3200, duration: 3200, zh: '其实有更优雅的解法 — PWA 安装页生成器。',
+                                en: 'There is a better way. The PWA install page generator.' },
+    { t:  6700, duration: 4200, zh: '输入网址，秒级生成精美安装页，三套模板任选。',
+                                en: 'Enter your URL. Generate a beautiful install page in seconds. Three templates to choose from.' },
+    { t: 11200, duration: 4200, zh: '用户一键添加到主屏幕，桌面图标直接以独立窗口启动你的网站。',
+                                en: 'Users add to home screen with one tap. The icon launches your site in a standalone window.' },
+    { t: 15700, duration: 4200, zh: 'Facebook、TikTok、Kwai 像素跟踪，安装成功事件自动回传广告平台。',
+                                en: 'Facebook, TikTok, Kwai pixel tracking. Install events fire straight to your ad platforms.' },
+    { t: 20200, duration: 3700, zh: '三千多投流团队正在使用，跨境电商、iGaming、社交、短剧全场景适用。',
+                                en: 'Over three thousand performance marketers use it. Cross-border, iGaming, social, drama, all use cases.' },
+    { t: 24200, duration: 5500, zh: '完全免费，无需注册。访问 pwa.ipcloak.ai，立即开始。',
+                                en: 'Free, no signup required. Visit pwa.ipcloak.ai. Get started now.' },
+  ];
+  // 暴露给 TTS 脚本 (Puppeteer 也能拿到)
+  window.__SCRIPT = SCRIPT;
+  window.__TOTAL_MS = TOTAL * 1000;
 
   const easeOut = t => 1 - Math.pow(1 - t, 3);
   const lerp = (a, b, t) => a + (b - a) * t;
