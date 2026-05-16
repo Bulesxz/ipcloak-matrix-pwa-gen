@@ -6,15 +6,17 @@
 #   ./deploy.sh             # 部署 production (绑 pwa.ipcloak.ai)
 #   ./deploy.sh --preview   # 部署 preview branch
 #
-# 前置条件:
-#   1. wrangler login    (已登录就跳过)
-#   2. KV namespace 已创建 + wrangler.toml 里 id 已填
-#      首次执行: wrangler kv namespace create PWA_APPS
+# Token 直接写死在本文件里 (此仓库为私有, 不会泄漏)
+# KV namespace PWA_APPS 已创建, id 见 wrangler.toml
 # ============================================================================
 
 set -euo pipefail
 
 cd "$(dirname "$0")"
+
+# ----- Cloudflare 凭据 (写死) -----
+export CLOUDFLARE_ACCOUNT_ID="1384d3a46efbbe6ebe76f099ea8ef159"
+export CLOUDFLARE_API_TOKEN="cfut_xTWMbg0r8cEhBZ54PgQH12i3kwXhUbI8f6l3jSZN8b4ae4a7"
 
 BRANCH="main"
 if [[ "${1:-}" == "--preview" ]]; then
