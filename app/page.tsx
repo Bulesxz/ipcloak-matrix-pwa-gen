@@ -87,7 +87,7 @@ export default function Home() {
         <div className="text-center max-w-3xl mx-auto space-y-6 animate-in fade-in zoom-in duration-700">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-purple-200 mb-4 backdrop-blur-md">
             <Sparkles className="w-4 h-4 text-purple-400" />
-            <span>ipcloak.ai · PWA Installer Generator</span>
+            <span>ipcloak.ai · PWA Installer Generator · {lang === 'zh' ? 'W2A 投流必备' : 'W2A for performance marketers'}</span>
           </div>
 
           <h1
@@ -143,7 +143,7 @@ export default function Home() {
               <CardContent className="p-5 space-y-3">
                 <div className="flex items-center gap-2 text-pink-300 text-sm font-medium">
                   <PlusCircle className="w-4 h-4" />
-                  {lang === 'zh' ? 'W2A 模式 · 直接创建' : 'W2A Mode · From Scratch'}
+                  {lang === 'zh' ? '直接创建 · PWA / APK' : 'Build from Scratch · PWA / APK'}
                 </div>
                 <p className="text-xs text-neutral-300 leading-relaxed min-h-[32px]">
                   {lang === 'zh'

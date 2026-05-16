@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 const SITE_URL = "https://pwa.ipcloak.ai";
-const SITE_NAME = "IPCloak.AI · W2A 生成器";
-const TITLE = "W2A 生成器 — 一键把网站变成可安装 App (PWA + APK) | IPCloak.AI";
-const DESCRIPTION = "投流圈最常用的 W2A (Web-to-App) 工具：输入网站 URL 秒级生成精美 PWA / APK 安装页, 内置 Facebook / TikTok / Kwai 像素跟踪, 安装成功自动回传广告平台。绕过应用商店审核, 提升广告 ROI 与用户留存。";
+const SITE_NAME = "IPCloak.AI · PWA 安装页生成器";
+const TITLE = "PWA 安装页生成器 (W2A) — 把网站变成可安装 App, 支持 APK + 像素跟踪 | IPCloak.AI";
+const DESCRIPTION = "免费 PWA 安装页生成器, 投流圈称之为 W2A (Web-to-App)。输入网站 URL 秒级生成精美 PWA / APK 安装页, 内置 Facebook / TikTok / Kwai 像素跟踪, 安装成功自动回传广告平台。绕过应用商店审核, 提升广告 ROI 与用户留存。";
 const KEYWORDS = [
   // 核心产品词
   "W2A", "Web to App", "Web2App", "网站转 App", "H5 转 App", "落地页转 App",
@@ -127,8 +127,8 @@ const jsonLd = {
     {
       "@type": "SoftwareApplication",
       "@id": `${SITE_URL}/#software`,
-      name: "IPCloak.AI W2A Generator",
-      alternateName: ["W2A 生成器", "Web-to-App Generator", "PWA 安装页生成器"],
+      name: "IPCloak.AI PWA Installer Generator",
+      alternateName: ["PWA 安装页生成器", "PWA Generator", "W2A 生成器", "Web-to-App Generator", "APK 下载页生成器"],
       url: SITE_URL,
       applicationCategory: "BusinessApplication",
       applicationSubCategory: "Marketing Tool",
