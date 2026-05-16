@@ -122,3 +122,59 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ============ Rainbow animation (for install buttons) ============ */
+@keyframes rainbow-flow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes rainbow-pulse {
+  0%, 100% { box-shadow: 0 8px 25px -5px rgba(236, 72, 153, 0.5), 0 4px 12px -2px rgba(59, 130, 246, 0.4); }
+  50%      { box-shadow: 0 12px 35px -5px rgba(236, 72, 153, 0.7), 0 6px 18px -2px rgba(59, 130, 246, 0.6); }
+}
+
+.rainbow-button {
+  background: linear-gradient(
+    90deg,
+    #ff6b6b 0%,
+    #feca57 14%,
+    #48dbfb 28%,
+    #1dd1a1 42%,
+    #5f27cd 56%,
+    #ee5a6f 70%,
+    #ff6b6b 100%
+  );
+  background-size: 300% 100%;
+  animation: rainbow-flow 4s linear infinite, rainbow-pulse 2.5s ease-in-out infinite;
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border: none !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.rainbow-button::after {
+  /* 高光扫光: 一道斜的白色高光每隔几秒扫过去 */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: rainbow-shine 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes rainbow-shine {
+  0%   { left: -100%; }
+  50%  { left: 100%; }
+  100% { left: 100%; }
+}

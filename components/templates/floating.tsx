@@ -60,7 +60,7 @@ export default function FloatingTemplate({ app }: { app: AppConfig }) {
                     <InstallPrompt
                         lang={lang}
                         customLabel={app.installLabel}
-                        buttonClassName={`w-full h-14 text-lg rounded-2xl font-bold shadow-[0_8px_30px_rgba(59,130,246,0.5)] bg-blue-600 hover:bg-blue-700 ${buttonShadowText} flex items-center justify-center gap-2`}
+                        buttonClassName="rainbow-button w-full h-14 text-lg rounded-2xl font-bold flex items-center justify-center gap-2"
                         installedClassName="w-full h-14 rounded-2xl bg-green-500/30 text-green-100 font-bold flex items-center justify-center gap-2 backdrop-blur-sm border border-green-400/30"
                     />
                 </div>

@@ -689,12 +689,12 @@ function PreviewFloating({ config }: { config: AppConfig }) {
                 )}
             </div>
 
-            {/* 底部悬浮按钮 */}
+            {/* 底部悬浮按钮 (彩虹动画) */}
             <div
                 className="absolute bottom-0 left-0 right-0 z-20 px-3 pt-10 pb-3"
                 style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0.7) 100%)' }}
             >
-                <div className="w-full py-3 bg-blue-600 text-white rounded-2xl font-bold text-center shadow-lg text-sm">
+                <div className="rainbow-button w-full py-3 rounded-2xl font-bold text-center text-sm">
                     {previewInstallLabel(config)}
                 </div>
             </div>
