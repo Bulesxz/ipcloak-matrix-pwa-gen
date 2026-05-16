@@ -6,15 +6,15 @@ import { ArrowRight, ArrowLeft } from 'lucide-react';
 export const runtime = 'edge';
 
 export const metadata: Metadata = {
-  title: '行业案例 · PWA 安装页生成器 (W2A)',
+  title: '行业案例 · PWA 安装页生成器',
   description:
-    '5 大行业 W2A 实战案例: 短剧、iGaming、社交婚恋、跨境电商、金融工具。看看同行如何用 PWA 安装页提升留存、降低 CPI、绕开商店审核。',
+    '5 大行业 PWA 安装页实战案例: 短剧、iGaming、社交婚恋、跨境电商、金融工具。看看同行如何用 PWA 安装页提升留存、降低 CPI、绕开商店审核 (投流圈也称 W2A)。',
   alternates: {
     canonical: 'https://pwa.ipcloak.ai/cases',
   },
   openGraph: {
     title: '行业案例 · IPCloak.AI PWA 安装页生成器',
-    description: '短剧 / iGaming / 社交 / 电商 / 金融 — 5 大行业 W2A 投流实战拆解',
+    description: '短剧 / iGaming / 社交 / 电商 / 金融 — 5 大行业 PWA 安装页投流实战拆解',
     url: 'https://pwa.ipcloak.ai/cases',
   },
 };
@@ -23,8 +23,8 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
-  name: 'PWA / W2A 行业案例',
-  description: '5 大行业的 W2A 安装页投流实战案例',
+  name: 'PWA 安装页 — 行业案例',
+  description: '5 大行业的 PWA 安装页投流实战案例 (W2A 解决方案)',
   itemListElement: CASES.map((c, i) => ({
     '@type': 'ListItem',
     position: i + 1,
@@ -67,10 +67,12 @@ export default function CasesIndexPage() {
             <span>📚 行业案例</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60 mb-6">
-            5 大行业 W2A 实战案例
+            5 大行业 PWA 安装页实战
           </h1>
           <p className="text-lg md:text-xl text-neutral-400 leading-relaxed">
             看看同行如何用 PWA 安装页 + 像素跟踪, 把广告 ROI 翻倍
+            <br />
+            <span className="text-sm text-neutral-500">投流圈也称之为 W2A (Web-to-App)</span>
           </p>
         </div>
 

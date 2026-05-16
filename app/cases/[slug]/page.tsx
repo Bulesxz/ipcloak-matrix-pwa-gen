@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const c = getCase(slug);
   if (!c) return { title: '案例未找到' };
 
-  const title = `${c.industry.zh} W2A 案例 — ${c.tagline.zh} | PWA 安装页生成器`;
+  const title = `${c.industry.zh} PWA 安装页案例 — ${c.tagline.zh}`;
   const description = c.painPoint.zh + ' — ' + c.solution.zh.slice(0, 60) + '...';
 
   return {
@@ -49,7 +49,7 @@ export default async function CaseDetailPage({ params }: Props) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
-    headline: `${c.industry.zh} W2A 案例 — ${c.tagline.zh}`,
+    headline: `${c.industry.zh} PWA 安装页案例 — ${c.tagline.zh}`,
     description: c.painPoint.zh,
     author: { '@type': 'Organization', name: 'IPCloak.AI', url: 'https://ipcloak.ai' },
     publisher: { '@type': 'Organization', name: 'IPCloak.AI', url: 'https://ipcloak.ai' },
@@ -97,7 +97,7 @@ export default async function CaseDetailPage({ params }: Props) {
             {c.tagline.zh}
           </h1>
           <p className="text-lg text-neutral-400 leading-relaxed max-w-3xl">
-            {c.industry.en} · W2A 投流案例拆解
+            {c.industry.en} · PWA 安装页投流案例拆解
           </p>
         </header>
 
@@ -139,7 +139,7 @@ export default async function CaseDetailPage({ params }: Props) {
             <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400">
               <Lightbulb className="w-5 h-5" />
             </div>
-            <h2 className="text-2xl font-bold text-white">W2A 解决方案</h2>
+            <h2 className="text-2xl font-bold text-white">PWA 安装页方案</h2>
           </div>
           <p className="text-base text-neutral-300 leading-relaxed">
             {c.solution.zh}
@@ -241,7 +241,7 @@ export default async function CaseDetailPage({ params }: Props) {
 
         {/* 免责小字 */}
         <p className="text-center text-xs text-neutral-600 mt-12 max-w-2xl mx-auto leading-relaxed">
-          * 数据为行业典型水平的合理预估, 用于演示 W2A 安装页 + 像素跟踪对投流的影响。实际效果以你的产品、创意和投放策略为准。
+          * 数据为行业典型水平的合理预估, 用于演示 PWA 安装页 + 像素跟踪对投流的影响。实际效果以你的产品、创意和投放策略为准。
         </p>
       </article>
     </main>

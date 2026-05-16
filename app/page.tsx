@@ -89,7 +89,7 @@ export default function Home() {
         <div className="text-center max-w-3xl mx-auto space-y-6 animate-in fade-in zoom-in duration-700">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-purple-200 mb-4 backdrop-blur-md">
             <Sparkles className="w-4 h-4 text-purple-400" />
-            <span>ipcloak.ai · PWA Installer Generator · {lang === 'zh' ? 'W2A 投流必备' : 'W2A for performance marketers'}</span>
+            <span>ipcloak.ai · PWA Installer Generator</span>
           </div>
 
           <h1
@@ -101,7 +101,7 @@ export default function Home() {
             {t.siteSub}
           </p>
 
-          {/* 两个等权 CTA: 扫站 / 直接创建 (W2A) */}
+          {/* 两个等权 CTA: 扫站 / 直接创建 */}
           <div className="max-w-2xl mx-auto mt-10 grid md:grid-cols-2 gap-3">
             {/* === 左: 扫站生成 (有现成网站) === */}
             <Card className="bg-white/5 border-white/10 backdrop-blur-xl shadow-2xl ring-1 ring-white/10 hover:ring-purple-400/40 transition-all">
@@ -140,7 +140,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            {/* === 右: W2A 直接创建 (无现成网站, 手动上传素材) === */}
+            {/* === 右: 直接创建 (无现成网站, 手动上传素材) === */}
             <Card className="bg-gradient-to-br from-purple-500/15 via-pink-500/10 to-blue-500/15 border-purple-400/30 backdrop-blur-xl shadow-2xl ring-1 ring-purple-400/20 hover:ring-purple-400/60 transition-all">
               <CardContent className="p-5 space-y-3">
                 <div className="flex items-center gap-2 text-pink-300 text-sm font-medium">
@@ -179,11 +179,11 @@ export default function Home() {
             </Card>
           </div>
 
-          {/* W2A 行业说明小条 */}
+          {/* PWA 能力小条 (投流圈也称 W2A, 作为括注) */}
           <p className="text-xs text-neutral-500 mt-4 max-w-xl mx-auto">
             {lang === 'zh'
-              ? 'W2A (Web-to-App) · 投流圈常用叫法, 把 H5 / 落地页变成可下载的 App, 提升广告 ROI 与用户留存'
-              : 'W2A (Web-to-App) · industry term for converting H5/landing pages into installable Apps, boosting ad ROI and retention'}
+              ? 'PWA 安装页 · 让用户把网站装到桌面, 离线可用 / 消息推送 / 独立启动 — 跨境投流圈也称 W2A (Web-to-App)'
+              : 'PWA install pages · users add your site to home screen for offline access, push notifications & standalone launch — known as W2A (Web-to-App) in performance marketing'}
           </p>
 
           <div className="pt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-left opacity-80">

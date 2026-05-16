@@ -52,7 +52,7 @@ export const CASES: CaseStudy[] = [
       en: 'Short drama users binge episode 1 then bounce — sky-high CPI with no return path back to your series catalog.',
     },
     solution: {
-      zh: 'W2A 安装页把短剧站打包成 PWA, 用户"装到桌面"后, 桌面图标=直接回看入口。配合 FB / Kwai 像素跟踪安装事件, 算法快速识别高价值用户, 二次曝光转化率翻倍。',
+      zh: 'PWA 安装页把短剧站打包成可安装应用, 用户"装到桌面"后, 桌面图标=直接回看入口。配合 FB / Kwai 像素跟踪安装事件, 算法快速识别高价值用户, 二次曝光转化率翻倍。',
       en: 'Wrap your short-drama site as a PWA. Once users add the icon to home screen, the icon becomes their re-entry path. Pixel-tracked install events let FB/Kwai retarget the highest-LTV audiences automatically.',
     },
     metrics: [
@@ -99,7 +99,7 @@ export const CASES: CaseStudy[] = [
       en: 'iGaming verticals are banned from Google Play and App Store. H5 traffic doesn\'t stick; raw APK distribution scares users with "unknown sources" warnings. Compliance risk is sky-high.',
     },
     solution: {
-      zh: 'W2A 双分发: PWA 模式提供"无安装包"的桌面快捷方式(绕过 Android 安全警告), APK 模式提供原生下载页面(Google Play 风格模板降低用户警惕)。一份配置自动判断设备, 自动选择最优分发路径。',
+      zh: '双分发组合: PWA 安装页提供"无安装包"的桌面快捷方式(绕过 Android 安全警告), APK 模式提供原生下载页面(Google Play 风格模板降低用户警惕)。一份配置自动判断设备, 自动选择最优分发路径。',
       en: 'Dual distribution: PWA for icon-only desktop install (bypasses Android security warnings), APK with Google Play-styled download page (lowers user friction). One config auto-detects device and picks the optimal path.',
     },
     metrics: [
@@ -193,7 +193,7 @@ export const CASES: CaseStudy[] = [
       en: 'DTC sites struggle with repeat purchase — first-time buyers never return because there\'s no app icon to remind them. Native apps are capital-heavy with murky ROI.',
     },
     solution: {
-      zh: 'W2A 安装页一键把 Shopify 店铺打包成 PWA, 用户首单后引导"装到桌面" → 桌面图标=随时复购入口。促销活动通过 push notification 直达, 跳过邮件营销低开启率的尴尬。',
+      zh: 'PWA 安装页一键把 Shopify 店铺打包成可安装应用, 用户首单后引导"装到桌面" → 桌面图标=随时复购入口。促销活动通过 push notification 直达, 跳过邮件营销低开启率的尴尬。',
       en: 'One-click wrap your Shopify store as a PWA. After first purchase, prompt "Add to Home Screen" → the icon is now your repeat-purchase channel. Push notifications bypass email\'s 20% open-rate ceiling.',
     },
     metrics: [

@@ -65,7 +65,7 @@ export async function GET() {
           }}
         >
           <span style={{ fontSize: 28 }}>✨</span>
-          ipcloak.ai · W2A Generator
+          ipcloak.ai · PWA Installer Generator
         </div>
 
         {/* 主标题 */}
@@ -89,7 +89,7 @@ export async function GET() {
               letterSpacing: '-0.02em',
             }}
           >
-            W2A 一键生成
+            PWA 安装页
           </div>
           <div
             style={{

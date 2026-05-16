@@ -14,14 +14,15 @@ const geistMono = Geist_Mono({
 
 const SITE_URL = "https://pwa.ipcloak.ai";
 const SITE_NAME = "IPCloak.AI · PWA 安装页生成器";
-const TITLE = "PWA 安装页生成器 (W2A) — 把网站变成可安装 App, 支持 APK + 像素跟踪 | IPCloak.AI";
-const DESCRIPTION = "免费 PWA 安装页生成器, 投流圈称之为 W2A (Web-to-App)。输入网站 URL 秒级生成精美 PWA / APK 安装页, 内置 Facebook / TikTok / Kwai 像素跟踪, 安装成功自动回传广告平台。绕过应用商店审核, 提升广告 ROI 与用户留存。";
+const TITLE = "PWA 安装页生成器 · 把网站装到桌面 + 像素跟踪 | IPCloak.AI";
+const DESCRIPTION = "免费 PWA 安装页生成器。输入网站 URL 秒级生成精美安装页, 用户加到桌面后获得原生 App 般的体验 — 离线访问、消息推送、独立窗口启动。内置 Facebook / TikTok / Kwai 像素跟踪, 安装成功自动回传广告平台。绕过应用商店审核, 提升广告 ROI 与用户留存。投流圈常称 W2A (Web-to-App)。";
 const KEYWORDS = [
-  // 核心产品词
+  // 核心产品词 — PWA 系列优先 (用户搜索量最大)
+  "PWA", "PWA 生成器", "PWA Generator", "PWA 安装页", "PWA 安装页生成器", "PWA 制作工具", "Progressive Web App",
+  "添加到主屏幕", "Add to Home Screen", "桌面快捷方式", "网站装到桌面",
+  // 行业别称
   "W2A", "Web to App", "Web2App", "网站转 App", "H5 转 App", "落地页转 App",
-  // PWA
-  "PWA", "PWA 生成器", "PWA Generator", "PWA 安装页", "PWA 制作工具",
-  // APK
+  // APK 配套
   "APK 生成器", "APK 下载页", "Android 安装包",
   // 像素
   "Facebook Pixel", "TikTok Pixel", "Kwai Pixel", "像素跟踪", "像素回传", "安装回调", "appinstalled",
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: TITLE,
-    template: "%s | IPCloak.AI W2A 生成器",
+    template: "%s | IPCloak.AI PWA 安装页生成器",
   },
   description: DESCRIPTION,
   keywords: KEYWORDS,
@@ -74,7 +75,7 @@ export const metadata: Metadata = {
         url: OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "IPCloak.AI W2A 生成器 — 一键把网站变成 App",
+        alt: "IPCloak.AI PWA 安装页生成器 — 一键把网站装到桌面",
         type: "image/png",
       },
     ],
@@ -174,7 +175,7 @@ const jsonLd = {
       sameAs: [
         "https://pwa.ipcloak.ai",
       ],
-      description: "IPCloak.AI 爱普出海 — 跨境投放与品牌出海工具矩阵, 提供 W2A 生成器、IP 代理、广告账户等基础设施。",
+      description: "IPCloak.AI 爱普出海 — 跨境投放与品牌出海工具矩阵, 提供 PWA 安装页生成器、IP 代理、广告账户等基础设施。",
     },
     {
       "@type": "WebSite",
@@ -197,7 +198,7 @@ const jsonLd = {
         {
           "@type": "ListItem",
           position: 2,
-          name: "W2A 生成器",
+          name: "PWA 安装页生成器",
           item: SITE_URL,
         },
       ],
@@ -207,18 +208,18 @@ const jsonLd = {
       mainEntity: [
         {
           "@type": "Question",
-          name: "什么是 W2A (Web-to-App)?",
+          name: "什么是 PWA 安装页?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "W2A 是 Web-to-App 的缩写, 投流圈常用叫法, 指把 H5 网站 / 落地页转换成可安装的 App (PWA 或 APK), 提升广告投放的转化率、用户留存与广告平台像素回传质量。",
+            text: "PWA (Progressive Web App) 安装页是一个特殊的网页, 提供「添加到主屏幕」按钮, 用户点击后浏览器会把你的网站图标添加到手机/电脑桌面。用户后续点击桌面图标会以独立窗口启动网站, 体验接近原生 App — 可离线访问、可接收推送通知、不显示浏览器地址栏。整个过程不需要应用商店审核, 不需要开发原生 App。",
           },
         },
         {
           "@type": "Question",
-          name: "W2A 生成器和 PWA 生成器有什么区别?",
+          name: "什么是 W2A? 和 PWA 安装页是同一个东西吗?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "PWA 生成器只输出 Progressive Web App, W2A 生成器是更广义的概念, 同时支持输出 PWA 安装页和 APK 下载页, 投放团队可以根据广告平台和受众设备选择最合适的分发方式。",
+            text: "W2A 是 Web-to-App 的缩写, 跨境投流/广告圈对这套做法的统称, 涵盖把网站转化为可安装应用的所有技术路径。PWA 安装页是 W2A 最主流、最优雅的实现方式 — 用户点一下按钮就装到桌面, 不下载安装包, 体验最丝滑。所以本工具实质上既是 PWA 安装页生成器, 也是投流圈说的 W2A 工具。",
           },
         },
         {
@@ -234,7 +235,7 @@ const jsonLd = {
           name: "生成的 PWA 是免费的吗?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "是的, IPCloak.AI W2A 生成器目前免费提供, 无需注册即可使用。",
+            text: "是的, IPCloak.AI PWA 安装页生成器目前完全免费提供, 无需注册即可使用。",
           },
         },
         {
