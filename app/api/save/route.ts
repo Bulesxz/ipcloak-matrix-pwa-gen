@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
-import { db, type PixelConfig } from '@/lib/db';
+import { db, type PixelConfig, type AppReviews, type AppTemplate, type AppLanguage } from '@/lib/db';
 
 export const runtime = 'edge';
 
 const ALLOWED_PLATFORMS = new Set(['none', 'facebook', 'tiktok', 'kwai']);
+const ALLOWED_TEMPLATES = new Set(['classic', 'playstore', 'floating']);
+const ALLOWED_LANGS = new Set(['zh', 'en']);
 
 function sanitizePixel(input: unknown): PixelConfig | undefined {
     if (!input || typeof input !== 'object') return undefined;
@@ -22,6 +24,25 @@ function sanitizePixel(input: unknown): PixelConfig | undefined {
     };
 }
 
+function sanitizeReviews(input: unknown): AppReviews | undefined {
+    if (!input || typeof input !== 'object') return undefined;
+    const r = input as Record<string, unknown>;
+    const out: AppReviews = {};
+    if (typeof r.rating === 'number' && isFinite(r.rating) && r.rating >= 0 && r.rating <= 5) out.rating = r.rating;
+    if (typeof r.reviewCount === 'string' && r.reviewCount.trim()) out.reviewCount = r.reviewCount.slice(0, 32);
+    if (typeof r.downloads === 'string' && r.downloads.trim()) out.downloads = r.downloads.slice(0, 32);
+    return Object.keys(out).length ? out : undefined;
+}
+
+function sanitizeScreenshots(input: unknown): string[] | undefined {
+    if (!Array.isArray(input)) return undefined;
+    const arr = input
+        .filter((s): s is string => typeof s === 'string' && /^https?:\/\//.test(s))
+        .map((s) => s.slice(0, 2000))
+        .slice(0, 5);
+    return arr.length ? arr : undefined;
+}
+
 export async function POST(request: Request) {
     try {
         const body = (await request.json()) as Record<string, unknown>;
@@ -29,6 +50,13 @@ export async function POST(request: Request) {
         if (!body.name || !body.url) {
             return NextResponse.json({ error: 'Name and URL are required' }, { status: 400 });
         }
+
+        const template: AppTemplate = typeof body.template === 'string' && ALLOWED_TEMPLATES.has(body.template)
+            ? (body.template as AppTemplate)
+            : 'classic';
+        const language: AppLanguage = typeof body.language === 'string' && ALLOWED_LANGS.has(body.language)
+            ? (body.language as AppLanguage)
+            : 'zh';
 
         const savedApp = await db.saveApp({
             id: typeof body.id === 'string' ? body.id : undefined,
@@ -38,6 +66,10 @@ export async function POST(request: Request) {
             iconUrl: String(body.iconUrl || '').slice(0, 2000),
             backgroundColor: String(body.backgroundColor || '#ffffff').slice(0, 20),
             pixel: sanitizePixel(body.pixel),
+            template,
+            language,
+            reviews: sanitizeReviews(body.reviews),
+            screenshots: sanitizeScreenshots(body.screenshots),
         });
 
         return NextResponse.json(savedApp);

@@ -24,6 +24,18 @@ export interface PixelConfig {
   currency?: string;
 }
 
+export type AppTemplate = 'classic' | 'playstore' | 'floating';
+export type AppLanguage = 'zh' | 'en';
+
+export interface AppReviews {
+  /** 平均评分 (0-5), 可选填 */
+  rating?: number;
+  /** 评价总数 (1234 / 1234567 / 10000+ 等任意展示文案) */
+  reviewCount?: string;
+  /** 下载量展示 (50K+ / 1M+ / 100,000+ 等任意展示文案) */
+  downloads?: string;
+}
+
 export interface AppConfig {
   id?: string;
   url: string;
@@ -31,8 +43,16 @@ export interface AppConfig {
   description: string;
   iconUrl: string;
   backgroundColor: string;
-  /** ⭐ 新: 像素跟踪配置 */
+  /** ⭐ 像素跟踪配置 */
   pixel?: PixelConfig;
+  /** ⭐ 模板选择 (classic / playstore / floating) */
+  template?: AppTemplate;
+  /** ⭐ 安装页文案语言 (zh / en) */
+  language?: AppLanguage;
+  /** ⭐ 评分 / 下载量 (PlayStore 模板专用, 可选填) */
+  reviews?: AppReviews;
+  /** ⭐ 截图 URL 数组 (PlayStore 模板可选, max 5 张) */
+  screenshots?: string[];
   /** 创建时间 (ISO string, 跟旧版本兼容) */
   createdAt?: string;
 }
