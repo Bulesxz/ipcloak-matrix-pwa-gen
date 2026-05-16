@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CASES, getCase } from '@/lib/cases';
 import { ArrowLeft, ArrowRight, CheckCircle2, TrendingUp, Lightbulb, Layers } from 'lucide-react';
+import MatrixFooter from '@/components/matrix-footer';
 
 export const runtime = 'edge';
 
@@ -244,6 +245,8 @@ export default async function CaseDetailPage({ params }: Props) {
           * 数据为行业典型水平的合理预估, 用于演示 PWA 安装页 + 像素跟踪对投流的影响。实际效果以你的产品、创意和投放策略为准。
         </p>
       </article>
+
+      <MatrixFooter lang="zh" />
     </main>
   );
 }

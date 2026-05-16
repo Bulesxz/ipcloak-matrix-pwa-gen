@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, Smartphone, Sparkles, Loader2, Activity, Languages, PlusCircle } from 'lucide-react';
 import { dict, type Dict } from '@/lib/i18n';
 import { CASES } from '@/lib/cases';
+import MatrixFooter from '@/components/matrix-footer';
 
 type SiteLang = 'zh' | 'en';
 
@@ -263,6 +264,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* IPCloak 矩阵 footer */}
+      <MatrixFooter lang={lang} />
     </main>
   );
 }

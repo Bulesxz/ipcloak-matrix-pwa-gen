@@ -121,15 +121,71 @@ export const metadata: Metadata = {
   },
 };
 
-// JSON-LD 结构化数据 (SoftwareApplication + Organization + WebSite)
+// JSON-LD 结构化数据
+// 矩阵 SEO 关键设计:
+//   - Organization 集中声明所有 sibling 子站 (sameAs) → 让 Google 把 ipcloak.ai 整个矩阵识别为同一品牌实体
+//   - WebSite.isPartOf 指向主站 WebSite → 子站归属关系
+//   - SoftwareApplication.publisher 用 @id 引用主站 Organization → 产品所有权
+//   - BreadcrumbList: 主站 → 产品矩阵 hub → 本产品
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
+    // ============ 主站 Organization (品牌实体, 所有矩阵子站共享同一 @id) ============
+    {
+      "@type": ["Organization", "Brand"],
+      "@id": "https://ipcloak.ai/#org",
+      name: "IPCloak.AI",
+      alternateName: ["爱普出海", "IPCloak", "ipcloak.ai"],
+      url: "https://ipcloak.ai",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://ipcloak.ai/logo.png",
+        width: 512,
+        height: 512,
+      },
+      description: "IPCloak.AI 爱普出海 — 跨境投放与品牌出海基础设施矩阵, 旗下涵盖广告斗篷、PWA 安装页生成器、品牌短链、代码混淆、指纹浏览器等核心工具。",
+      slogan: "下一代流量安全与分发基础设施",
+      // sameAs: 把矩阵所有子站列出, 让 Google Knowledge Graph 合并实体
+      sameAs: [
+        "https://ipcloak.ai",
+        "https://cloak.ipcloak.ai",
+        "https://pwa.ipcloak.ai",
+        "https://link.ipcloak.ai",
+        "https://armor.ipcloak.ai",
+        "https://browser.ipcloak.ai",
+        "https://page.ipcloak.ai",
+        "https://scrm.ipcloak.ai",
+      ],
+    },
+
+    // ============ 主站 WebSite (本子站 isPartOf 此节点) ============
+    {
+      "@type": "WebSite",
+      "@id": "https://ipcloak.ai/#website",
+      url: "https://ipcloak.ai",
+      name: "IPCloak.AI · 爱普出海",
+      publisher: { "@id": "https://ipcloak.ai/#org" },
+      inLanguage: ["zh-CN", "en-US"],
+    },
+
+    // ============ 本子站 WebSite (归属于主站 WebSite) ============
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: SITE_NAME,
+      description: DESCRIPTION,
+      publisher: { "@id": "https://ipcloak.ai/#org" },
+      isPartOf: { "@id": "https://ipcloak.ai/#website" },  // ← 矩阵归属
+      inLanguage: ["zh-CN", "en-US"],
+    },
+
+    // ============ 本产品 SoftwareApplication ============
     {
       "@type": "SoftwareApplication",
       "@id": `${SITE_URL}/#software`,
       name: "IPCloak.AI PWA Installer Generator",
-      alternateName: ["PWA 安装页生成器", "PWA Generator", "W2A 生成器", "Web-to-App Generator", "APK 下载页生成器"],
+      alternateName: ["IPPWA", "爱普PWA", "PWA 安装页生成器", "PWA Generator", "W2A 生成器", "Web-to-App Generator", "APK 下载页生成器"],
       url: SITE_URL,
       applicationCategory: "BusinessApplication",
       applicationSubCategory: "Marketing Tool",
@@ -159,33 +215,12 @@ const jsonLd = {
         "中英双语支持",
         "无需扫站, 直接创建",
       ],
-      author: {
-        "@type": "Organization",
-        name: "IPCloak.AI",
-        url: "https://ipcloak.ai",
-      },
-    },
-    {
-      "@type": "Organization",
-      "@id": "https://ipcloak.ai/#org",
-      name: "IPCloak.AI",
-      alternateName: "爱普出海",
-      url: "https://ipcloak.ai",
-      logo: "https://ipcloak.ai/logo.png",
-      sameAs: [
-        "https://pwa.ipcloak.ai",
-      ],
-      description: "IPCloak.AI 爱普出海 — 跨境投放与品牌出海工具矩阵, 提供 PWA 安装页生成器、IP 代理、广告账户等基础设施。",
-    },
-    {
-      "@type": "WebSite",
-      "@id": `${SITE_URL}/#website`,
-      url: SITE_URL,
-      name: SITE_NAME,
-      description: DESCRIPTION,
+      // 矩阵归属
       publisher: { "@id": "https://ipcloak.ai/#org" },
-      inLanguage: ["zh-CN", "en-US"],
+      isPartOf: { "@id": "https://ipcloak.ai/#website" },
     },
+
+    // ============ 面包屑: 主站 → 产品矩阵 → 本产品 ============
     {
       "@type": "BreadcrumbList",
       itemListElement: [
@@ -198,6 +233,12 @@ const jsonLd = {
         {
           "@type": "ListItem",
           position: 2,
+          name: "产品矩阵",
+          item: "https://ipcloak.ai/#products",
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
           name: "PWA 安装页生成器",
           item: SITE_URL,
         },
