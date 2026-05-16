@@ -536,7 +536,7 @@ function PreviewClassic({ config }: { config: AppConfig }) {
                 </div>
                 <h2 className="text-xl font-bold mb-2 line-clamp-2">{config.name}</h2>
                 <p className="opacity-70 mb-6 text-sm leading-snug line-clamp-3">{config.description}</p>
-                <div className="w-full py-3 bg-blue-600 text-white rounded-full font-bold">
+                <div className="rainbow-button w-full py-3 rounded-full font-bold">
                     {previewInstallLabel(config)}
                 </div>
             </div>
@@ -600,8 +600,8 @@ function PreviewPlaystore({ config }: { config: AppConfig }) {
                     </div>
                 </div>
 
-                {/* 安装按钮 */}
-                <div className="w-full h-8 rounded-md bg-[#1b6f47] text-white font-medium text-[11px] flex items-center justify-center mb-2">
+                {/* 安装按钮 (彩虹) */}
+                <div className="rainbow-button w-full h-8 rounded-md font-medium text-[11px] flex items-center justify-center mb-2">
                     {previewInstallLabel(config)}
                 </div>
 
