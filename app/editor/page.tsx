@@ -700,8 +700,8 @@ function PreviewPlaystore({ config }: { config: AppConfig }) {
                     </div>
                 </div>
 
-                {/* 安装按钮 (彩虹) */}
-                <div className="rainbow-button w-full h-8 rounded-md font-medium text-[11px] flex items-center justify-center mb-2">
+                {/* 安装按钮 (Google Play 深绿, 不用彩虹) */}
+                <div className="w-full h-8 rounded-md bg-[#1b6f47] text-white font-medium text-[11px] flex items-center justify-center mb-2">
                     {previewInstallLabel(config)}
                 </div>
 

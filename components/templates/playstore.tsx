@@ -92,20 +92,20 @@ export default function PlaystoreTemplate({ app }: { app: AppConfig }) {
                     </div>
                 </div>
 
-                {/* ============ 安装按钮 (深绿 + 圆角 8px) ============ */}
+                {/* ============ 安装按钮 (Google Play 风格: 深绿 #1b6f47 + 圆角 8px, 不用彩虹) ============ */}
                 <div className="mb-3">
                     {app.distribution === 'apk' ? (
                         <ApkButton
                             apkUrl={app.apkUrl}
                             lang={lang}
                             customLabel={app.installLabel}
-                            buttonClassName="rainbow-button w-full h-11 rounded-lg font-medium text-[15px] flex items-center justify-center"
+                            buttonClassName="w-full h-11 rounded-lg bg-[#1b6f47] hover:bg-[#15573a] text-white font-medium text-[15px] flex items-center justify-center"
                         />
                     ) : (
                         <InstallPrompt
                             lang={lang}
                             customLabel={app.installLabel}
-                            buttonClassName="rainbow-button w-full h-11 rounded-lg font-medium text-[15px] flex items-center justify-center"
+                            buttonClassName="w-full h-11 rounded-lg bg-[#1b6f47] hover:bg-[#15573a] text-white font-medium text-[15px] flex items-center justify-center"
                             installedClassName="w-full h-11 rounded-lg bg-emerald-50 text-emerald-700 font-medium text-[15px] flex items-center justify-center gap-2 border border-emerald-200"
                         />
                     )}
