@@ -21,6 +21,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
         title: `Install ${app.name}`,
         description: app.description,
+        // ⭐ 让 Chrome 把这个页认成可安装 PWA: manifest + theme-color + apple-touch-icon
+        manifest: `/install/${id}/manifest.webmanifest`,
+        themeColor: app.backgroundColor || '#ffffff',
+        appleWebApp: {
+            capable: true,
+            title: app.name,
+            statusBarStyle: 'default',
+        },
+        icons: {
+            icon: app.iconUrl,
+            apple: app.iconUrl,
+        },
         openGraph: {
             title: app.name,
             description: app.description,
