@@ -99,54 +99,90 @@ export default function Home() {
             {t.siteSub}
           </p>
 
-          <Card className="max-w-xl mx-auto mt-10 bg-white/5 border-white/10 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
-            <CardContent className="p-2">
-              <form onSubmit={handleScan} className="flex gap-2">
-                <Input
-                  type="url"
-                  placeholder="https://example.com"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  required
-                  className="bg-transparent border-transparent text-white placeholder:text-neutral-500 focus-visible:ring-0 focus-visible:ring-offset-0 h-12 text-lg"
-                />
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="h-12 px-6 bg-white text-black hover:bg-neutral-200 transition-all font-semibold rounded-lg"
-                >
-                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t.siteCTA}
-                  {!loading && <ArrowRight className="w-5 h-5 ml-2" />}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+          {/* 两个等权 CTA: 扫站 / 直接创建 (W2A) */}
+          <div className="max-w-2xl mx-auto mt-10 grid md:grid-cols-2 gap-3">
+            {/* === 左: 扫站生成 (有现成网站) === */}
+            <Card className="bg-white/5 border-white/10 backdrop-blur-xl shadow-2xl ring-1 ring-white/10 hover:ring-purple-400/40 transition-all">
+              <CardContent className="p-5 space-y-3">
+                <div className="flex items-center gap-2 text-purple-300 text-sm font-medium">
+                  <Sparkles className="w-4 h-4" />
+                  {lang === 'zh' ? '已有网站' : 'Have a website'}
+                </div>
+                <p className="text-xs text-neutral-400 leading-relaxed min-h-[32px]">
+                  {lang === 'zh'
+                    ? '自动抓取图标 / 名称 / 描述, 一键生成'
+                    : 'Auto-fetch icon / name / description, one-click generate'}
+                </p>
+                <form onSubmit={handleScan} className="space-y-2">
+                  <Input
+                    type="url"
+                    placeholder="https://example.com"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    required
+                    className="bg-black/30 border-white/10 text-white placeholder:text-neutral-500 focus-visible:ring-1 focus-visible:ring-purple-400 h-11 text-base"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-11 bg-white text-black hover:bg-neutral-200 transition-all font-semibold rounded-lg"
+                  >
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                      <>
+                        {t.siteCTA}
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
 
-          {/* "直接创建" 第二个 CTA — 不扫站, 全部素材自己填 */}
-          <div className="flex items-center justify-center gap-3 text-neutral-500 text-sm mt-4">
-            <div className="h-px w-12 bg-white/10" />
-            {lang === 'zh' ? '或' : 'or'}
-            <div className="h-px w-12 bg-white/10" />
+            {/* === 右: W2A 直接创建 (无现成网站, 手动上传素材) === */}
+            <Card className="bg-gradient-to-br from-purple-500/15 via-pink-500/10 to-blue-500/15 border-purple-400/30 backdrop-blur-xl shadow-2xl ring-1 ring-purple-400/20 hover:ring-purple-400/60 transition-all">
+              <CardContent className="p-5 space-y-3">
+                <div className="flex items-center gap-2 text-pink-300 text-sm font-medium">
+                  <PlusCircle className="w-4 h-4" />
+                  {lang === 'zh' ? 'W2A 模式 · 直接创建' : 'W2A Mode · From Scratch'}
+                </div>
+                <p className="text-xs text-neutral-300 leading-relaxed min-h-[32px]">
+                  {lang === 'zh'
+                    ? '无原站? 自己上传图标 / 截图 / APK, 全自定义素材'
+                    : 'No source site? Upload icon / screenshots / APK yourself'}
+                </p>
+                <div className="space-y-2">
+                  <div className="h-11 px-3 flex items-center text-xs text-neutral-500 bg-black/20 rounded-md border border-white/5">
+                    {lang === 'zh' ? '无需 URL, 直接进入编辑器' : 'No URL needed, jump to editor'}
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      sessionStorage.setItem('scannedApp', JSON.stringify({
+                        url: '',
+                        name: '',
+                        description: '',
+                        iconUrl: '',
+                        backgroundColor: '#ffffff',
+                        language: lang,
+                      }));
+                      router.push('/editor');
+                    }}
+                    className="w-full h-11 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white transition-all font-semibold rounded-lg shadow-lg shadow-purple-500/30"
+                  >
+                    <PlusCircle className="w-5 h-5 mr-2" />
+                    {lang === 'zh' ? '开始创建' : 'Start Building'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              // 直接给一个空 stub 进 editor (扫站结果模拟)
-              sessionStorage.setItem('scannedApp', JSON.stringify({
-                url: '',
-                name: '',
-                description: '',
-                iconUrl: '',
-                backgroundColor: '#ffffff',
-                language: lang,
-              }));
-              router.push('/editor');
-            }}
-            className="inline-flex items-center gap-2 text-purple-300 hover:text-white text-sm transition-colors"
-          >
-            <PlusCircle className="w-4 h-4" />
-            {lang === 'zh' ? '直接创建 (不扫站, 自己上传素材)' : 'Create from scratch (skip scan, upload your own)'}
-          </button>
+
+          {/* W2A 行业说明小条 */}
+          <p className="text-xs text-neutral-500 mt-4 max-w-xl mx-auto">
+            {lang === 'zh'
+              ? 'W2A (Web-to-App) · 投流圈常用叫法, 把 H5 / 落地页变成可下载的 App, 提升广告 ROI 与用户留存'
+              : 'W2A (Web-to-App) · industry term for converting H5/landing pages into installable Apps, boosting ad ROI and retention'}
+          </p>
 
           <div className="pt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-left opacity-80">
             <div className="flex flex-col gap-2 p-4 rounded-xl hover:bg-white/5 transition-colors">
