@@ -6,7 +6,8 @@
 #   ./deploy.sh             # 部署 production (绑 pwa.ipcloak.ai)
 #   ./deploy.sh --preview   # 部署 preview branch
 #
-# Token 直接写死在本文件里 (此仓库为私有, 不会泄漏)
+# 凭据存放: ./.deploy.env (gitignored, 永不进 git)
+#   首次使用: cp .deploy.env.example .deploy.env, 填入 token
 # KV namespace PWA_APPS 已创建, id 见 wrangler.toml
 # ============================================================================
 
@@ -14,9 +15,22 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-# ----- Cloudflare 凭据 (写死) -----
-export CLOUDFLARE_ACCOUNT_ID="1384d3a46efbbe6ebe76f099ea8ef159"
-export CLOUDFLARE_API_TOKEN="cfut_xTWMbg0r8cEhBZ54PgQH12i3kwXhUbI8f6l3jSZN8b4ae4a7"
+# ----- 加载本地凭据 -----
+if [[ ! -f ".deploy.env" ]]; then
+  echo "❌ 缺少 .deploy.env"
+  echo "   cp .deploy.env.example .deploy.env"
+  echo "   编辑 .deploy.env 填入 CLOUDFLARE_API_TOKEN"
+  exit 1
+fi
+set -a
+# shellcheck disable=SC1091
+source .deploy.env
+set +a
+
+if [[ -z "${CLOUDFLARE_API_TOKEN:-}" || -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
+  echo "❌ .deploy.env 必须包含 CLOUDFLARE_API_TOKEN 和 CLOUDFLARE_ACCOUNT_ID"
+  exit 1
+fi
 
 BRANCH="main"
 if [[ "${1:-}" == "--preview" ]]; then

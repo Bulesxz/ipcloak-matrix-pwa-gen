@@ -4,4 +4,5 @@ node_modules
 .DS_Store
 *.log
 .env*.local
+.deploy.env
 data/apps.json
