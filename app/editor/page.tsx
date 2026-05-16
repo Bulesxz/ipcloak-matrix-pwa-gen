@@ -551,6 +551,18 @@ export default function Editor() {
                     <button
                         type="button"
                         onClick={() => {
+                            const hasPixel = config.pixel?.platform && config.pixel.platform !== 'none' && config.pixel.pixelId;
+                            // 像素 ID 是敏感资产 - 警告用户后再放进 URL
+                            let includePixel = false;
+                            if (hasPixel) {
+                                const platformName = config.pixel!.platform === 'facebook' ? 'Facebook'
+                                    : config.pixel!.platform === 'tiktok' ? 'TikTok' : 'Kwai';
+                                const msg = uiLang === 'zh'
+                                    ? `⚠️ 你配置了 ${platformName} Pixel\n\n无状态 URL 会把 Pixel ID 明文写在链接里, 任何拿到这个链接的人都能看到你的 Pixel ID 并伪造数据上报。\n\n是否在 URL 中包含 Pixel?\n\n确定 = 包含 (方便, 但 ID 暴露)\n取消 = 不含 (推荐, 想跟踪转化请改用上面 [生成安装页] 按钮)`
+                                    : `⚠️ You have ${platformName} Pixel configured\n\nThe stateless URL will embed Pixel ID in plain text. Anyone with this link can see your Pixel ID and inject fake events.\n\nInclude Pixel in URL?\n\nOK = Include (convenient, but exposed)\nCancel = Exclude (recommended, use [Generate Install Page] above for tracking)`;
+                                includePixel = window.confirm(msg);
+                            }
+
                             const p = new URLSearchParams();
                             if (config.name) p.set('name', config.name);
                             if (config.description) p.set('desc', config.description);
@@ -567,14 +579,20 @@ export default function Editor() {
                             if (config.reviews?.rating) p.set('rating', String(config.reviews.rating));
                             if (config.reviews?.reviewCount) p.set('reviews', config.reviews.reviewCount);
                             if (config.reviews?.downloads) p.set('downloads', config.reviews.downloads);
-                            if (config.pixel?.platform === 'facebook' && config.pixel.pixelId) p.set('fb', config.pixel.pixelId);
-                            if (config.pixel?.platform === 'tiktok' && config.pixel.pixelId) p.set('tt', config.pixel.pixelId);
-                            if (config.pixel?.platform === 'kwai' && config.pixel.pixelId) p.set('kwai', config.pixel.pixelId);
-                            if (config.pixel?.event) p.set('event', config.pixel.event);
+
+                            if (includePixel && config.pixel?.pixelId) {
+                                if (config.pixel.platform === 'facebook') p.set('fb', config.pixel.pixelId);
+                                else if (config.pixel.platform === 'tiktok') p.set('tt', config.pixel.pixelId);
+                                else if (config.pixel.platform === 'kwai') p.set('kwai', config.pixel.pixelId);
+                                if (config.pixel.event) p.set('event', config.pixel.event);
+                            }
 
                             const quickUrl = `${window.location.origin}/quick?${p.toString()}`;
+                            const successMsg = (uiLang === 'zh' ? '✓ 已复制无状态 URL\n\n' : '✓ Stateless URL copied\n\n')
+                                + quickUrl
+                                + (hasPixel && !includePixel ? (uiLang === 'zh' ? '\n\n(已按你的选择跳过 Pixel)' : '\n\n(Pixel skipped per your choice)') : '');
                             navigator.clipboard?.writeText(quickUrl).then(
-                                () => alert((uiLang === 'zh' ? '✓ 已复制无状态 URL 到剪贴板\n\n' : '✓ Stateless URL copied to clipboard\n\n') + quickUrl),
+                                () => alert(successMsg),
                                 () => prompt(uiLang === 'zh' ? '手动复制下方 URL:' : 'Copy URL manually:', quickUrl)
                             );
                         }}
