@@ -19,6 +19,24 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     //   targetUrl 为空时, launch route 会用 url 兜底.
     const startUrl = `/install/${id}/launch`;
 
+    // ⭐ 图标声明 — Chrome 可安装性硬要求:
+    //   Chrome 判定 PWA 可安装需要 manifest 至少声明一个 192px + 一个 512px 图标
+    //   (或单个 sizes:"any" 的 SVG). 旧版只写 { sizes:"any", type:"image/png" } —
+    //   Chrome 不接受 "PNG + any"(any 仅对 SVG 有效), 因此判定无合格图标,
+    //   beforeinstallprompt 不触发 → 安装页显示"无法自动安装".
+    //   修复: 同一图标 URL 用多个明确尺寸声明 (Chrome 信任 manifest 声明的 sizes,
+    //   普通 purpose:any 不会回查真实像素), 覆盖 192/256/384/512 + 一个 maskable.
+    const isSvg = /\.svg(\?|$)/i.test(app.iconUrl || '');
+    const icons = isSvg
+        ? [{ src: app.iconUrl, sizes: 'any', type: 'image/svg+xml', purpose: 'any' }]
+        : [
+            { src: app.iconUrl, sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: app.iconUrl, sizes: '256x256', type: 'image/png', purpose: 'any' },
+            { src: app.iconUrl, sizes: '384x384', type: 'image/png', purpose: 'any' },
+            { src: app.iconUrl, sizes: '512x512', type: 'image/png', purpose: 'any' },
+            { src: app.iconUrl, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ];
+
     const manifest = {
         name: app.name,
         short_name: app.name.slice(0, 12),
@@ -29,9 +47,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
         display: 'standalone',
         background_color: app.backgroundColor || '#ffffff',
         theme_color: app.backgroundColor || '#ffffff',
-        icons: [
-            { src: app.iconUrl, sizes: 'any', type: 'image/png', purpose: 'any' },
-        ],
+        icons,
     };
 
     return new Response(JSON.stringify(manifest, null, 2), {
