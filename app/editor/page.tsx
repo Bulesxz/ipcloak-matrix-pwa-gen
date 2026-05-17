@@ -277,13 +277,49 @@ export default function Editor() {
                             <Textarea id="description" value={config.description} onChange={(e) => handleChange('description', e.target.value)} className="min-h-[100px]" />
                         </div>
 
-                        <div className="grid w-full items-center gap-1.5">
-                            <Label htmlFor="icon">{t.editorIcon}</Label>
-                            <div className="flex gap-2 items-start">
-                                <Input id="icon" value={config.iconUrl} onChange={(e) => handleChange('iconUrl', e.target.value)} className="flex-1" />
-                                <UploadButton onUploaded={(url) => handleChange('iconUrl', url)} iconOnly />
-                            </div>
-                        </div>
+                        {(() => {
+                            const iconMissing = config.distribution !== 'apk' && !config.iconUrl?.trim();
+                            return (
+                                <div className="grid w-full items-center gap-1.5">
+                                    <Label htmlFor="icon" className="flex items-center gap-2">
+                                        {t.editorIcon}
+                                        {config.distribution !== 'apk' && (
+                                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${iconMissing ? 'bg-red-500/20 text-red-300 border border-red-500/40' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'}`}>
+                                                {iconMissing
+                                                    ? (uiLang === 'zh' ? '必填 · PWA 安装核心' : 'Required · PWA core')
+                                                    : (uiLang === 'zh' ? '✓ 已就绪' : '✓ Ready')}
+                                            </span>
+                                        )}
+                                    </Label>
+                                    <div className="flex gap-2 items-start">
+                                        {/* 当前图标预览 / 缺失占位 */}
+                                        <div className={`w-12 h-12 rounded-lg flex-shrink-0 overflow-hidden flex items-center justify-center text-xl ${iconMissing ? 'bg-red-500/10 border-2 border-dashed border-red-500/50 text-red-400' : 'bg-white/5 border border-white/15'}`}>
+                                            {config.iconUrl?.trim()
+                                                ? <img src={config.iconUrl} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.visibility = 'hidden'; }} />
+                                                : '🖼️'}
+                                        </div>
+                                        <Input
+                                            id="icon"
+                                            value={config.iconUrl}
+                                            onChange={(e) => handleChange('iconUrl', e.target.value)}
+                                            placeholder={uiLang === 'zh' ? '粘贴图标图片链接, 或点右侧上传 →' : 'Paste icon image URL, or upload →'}
+                                            className={`flex-1 ${iconMissing ? 'border-red-500/60 focus-visible:ring-red-500 placeholder:text-red-400/50' : ''}`}
+                                        />
+                                        <UploadButton onUploaded={(url) => handleChange('iconUrl', url)} iconOnly />
+                                    </div>
+                                    {iconMissing && (
+                                        <div className="mt-1 flex items-start gap-2 rounded-lg bg-red-500/10 border border-red-500/30 px-3 py-2 text-xs text-red-200 leading-relaxed">
+                                            <span className="text-base leading-none mt-0.5">⚠️</span>
+                                            <span>
+                                                {uiLang === 'zh'
+                                                    ? <>没能从该网站自动抓取到图标。<strong className="text-red-100">PWA 安装必须有图标</strong>(否则浏览器不弹安装提示, 桌面图标是空白)。请点右侧 <strong className="text-red-100">↑ 上传</strong> 一张图, 或粘贴图片链接 (建议 ≥512×512 PNG)。</>
+                                                    : <>Could not auto-fetch an icon from this site. <strong className="text-red-100">PWA install requires an icon</strong> (otherwise no install prompt + blank home-screen icon). Click <strong className="text-red-100">↑ Upload</strong> on the right, or paste an image URL (≥512×512 PNG recommended).</>}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })()}
 
                         <div className="grid grid-cols-2 gap-3">
                             <div className="grid gap-1.5">
@@ -702,23 +738,30 @@ export default function Editor() {
                     >
                         {loading ? t.editorGenerating : <><Save className="w-5 h-5 mr-2" /> {t.editorGenerate}</>}
                     </Button>
-                    {!canGenerate && !loading && (
-                        <div className="text-[11px] text-amber-400 text-center mt-1">
-                            {uiLang === 'zh'
-                                ? `还差: ${[
-                                    !config.name?.trim() && 'App 名称',
-                                    !config.url?.trim() && '网站 URL',
-                                    config.distribution !== 'apk' && !config.iconUrl?.trim() && '图标 (PWA 安装必需)',
-                                    config.distribution === 'apk' && !config.apkUrl?.trim() && 'APK 下载地址',
-                                ].filter(Boolean).join(' / ')}`
-                                : `Missing: ${[
-                                    !config.name?.trim() && 'App Name',
-                                    !config.url?.trim() && 'URL',
-                                    config.distribution !== 'apk' && !config.iconUrl?.trim() && 'Icon (required for PWA)',
-                                    config.distribution === 'apk' && !config.apkUrl?.trim() && 'APK URL',
-                                ].filter(Boolean).join(' / ')}`}
-                        </div>
-                    )}
+                    {!canGenerate && !loading && (() => {
+                        const missing = (uiLang === 'zh'
+                            ? [
+                                !config.name?.trim() && 'App 名称',
+                                !config.url?.trim() && '网站 URL',
+                                config.distribution !== 'apk' && !config.iconUrl?.trim() && '图标 (PWA 安装核心)',
+                                config.distribution === 'apk' && !config.apkUrl?.trim() && 'APK 下载地址',
+                            ]
+                            : [
+                                !config.name?.trim() && 'App Name',
+                                !config.url?.trim() && 'URL',
+                                config.distribution !== 'apk' && !config.iconUrl?.trim() && 'Icon (PWA core)',
+                                config.distribution === 'apk' && !config.apkUrl?.trim() && 'APK URL',
+                            ]).filter(Boolean) as string[];
+                        return (
+                            <div className="mt-2 flex items-center justify-center gap-2 rounded-lg bg-amber-500/15 border border-amber-500/40 px-4 py-2.5 text-sm text-amber-200 font-medium">
+                                <span className="text-base leading-none">⚠️</span>
+                                <span>
+                                    {uiLang === 'zh' ? '还需填写: ' : 'Still required: '}
+                                    <strong className="text-amber-100">{missing.join(' · ')}</strong>
+                                </span>
+                            </div>
+                        );
+                    })()}
 
                     <button
                         type="button"
