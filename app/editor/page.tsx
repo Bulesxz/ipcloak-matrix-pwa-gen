@@ -161,6 +161,14 @@ export default function Editor() {
             alert(uiLang === 'zh' ? '请填写网站 URL (PWA 启动地址)' : 'Please fill in Website URL (PWA start URL)');
             return;
         }
+        // ⭐ 图标是 PWA 安装的硬性要求 — 没有合法图标 Chrome 不会弹安装提示,
+        //    装出来的桌面图标也是空白. 没扫到 logo 时必须让用户手动上传/填.
+        if (config.distribution !== 'apk' && !config.iconUrl?.trim()) {
+            alert(uiLang === 'zh'
+                ? 'PWA 安装必须有图标 — 我们没能自动抓取到 logo, 请在「图标 URL」上传或填写一张图片 (建议 ≥512×512 PNG)'
+                : 'PWA install requires an icon — we could not auto-fetch a logo. Please upload or enter an image in "Icon URL" (≥512×512 PNG recommended)');
+            return;
+        }
         // APK 模式: APK URL 必填
         if (config.distribution === 'apk' && !config.apkUrl?.trim()) {
             alert(uiLang === 'zh' ? '选择了 APK 下载模式, 请填写 APK 下载地址' : 'APK distribution selected, please fill APK download URL');
@@ -188,11 +196,16 @@ export default function Editor() {
         }
     };
 
-    // 是否可以生成 (name + url 必填, APK 模式还需要 apkUrl)
+    // 是否可以生成:
+    //  - name + url 必填
+    //  - PWA 模式: iconUrl 必填 (PWA 安装核心硬要求, 没图标装不了)
+    //  - APK 模式: apkUrl 必填
     const canGenerate = !!(
         config.name?.trim()
         && config.url?.trim()
-        && (config.distribution !== 'apk' || config.apkUrl?.trim())
+        && (config.distribution === 'apk'
+            ? config.apkUrl?.trim()
+            : config.iconUrl?.trim())
     );
 
     return (
@@ -695,11 +708,13 @@ export default function Editor() {
                                 ? `还差: ${[
                                     !config.name?.trim() && 'App 名称',
                                     !config.url?.trim() && '网站 URL',
+                                    config.distribution !== 'apk' && !config.iconUrl?.trim() && '图标 (PWA 安装必需)',
                                     config.distribution === 'apk' && !config.apkUrl?.trim() && 'APK 下载地址',
                                 ].filter(Boolean).join(' / ')}`
                                 : `Missing: ${[
                                     !config.name?.trim() && 'App Name',
                                     !config.url?.trim() && 'URL',
+                                    config.distribution !== 'apk' && !config.iconUrl?.trim() && 'Icon (required for PWA)',
                                     config.distribution === 'apk' && !config.apkUrl?.trim() && 'APK URL',
                                 ].filter(Boolean).join(' / ')}`}
                         </div>

@@ -64,6 +64,22 @@ export async function POST(request: Request) {
             ? (body.distribution as AppDistribution)
             : 'pwa';
 
+        // 服务端兜底: PWA 模式必须有图标 (PWA 安装核心硬要求, 缺图标 Chrome 不弹安装提示).
+        // 前端已拦, 这里防绕过 (改请求 / 直连 API).
+        if (distribution !== 'apk' && !String(body.iconUrl || '').trim()) {
+            return NextResponse.json(
+                { error: 'PWA install requires an icon. Please provide iconUrl (≥512×512 image recommended).' },
+                { status: 400 },
+            );
+        }
+        // APK 模式必须有 apkUrl
+        if (distribution === 'apk' && !String(body.apkUrl || '').trim()) {
+            return NextResponse.json(
+                { error: 'APK distribution requires apkUrl.' },
+                { status: 400 },
+            );
+        }
+
         const savedApp = await db.saveApp({
             id: typeof body.id === 'string' ? body.id : undefined,
             url: String(body.url).slice(0, 2000),
