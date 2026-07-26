@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 const SITE_URL = "https://pwa.ipcloak.ai";
 const SITE_NAME = "IPCloak.AI · PWA 安装页生成器";
 const TITLE = "PWA 安装页生成器 · 把网站装到桌面 + 像素跟踪 | IPCloak.AI";
-const DESCRIPTION = "免费 PWA 安装页生成器。输入网站 URL 秒级生成精美安装页, 用户「添加到主屏幕」后, 桌面图标直接以独立窗口启动你的网站, 无浏览器地址栏, 体验接近原生 App。内置 Facebook / TikTok / Kwai 像素跟踪, 安装成功自动回传广告平台。绕过应用商店审核, 提升广告 ROI 与用户留存。投流圈常称 W2A (Web-to-App)。";
+const DESCRIPTION = "免费 PWA 安装页生成器。输入网站 URL 生成可安装页面，支持添加到主屏幕、独立窗口启动、Facebook / TikTok / Kwai 像素事件和多种页面模板，适合构建可复访的 Web-to-App 体验。";
 const KEYWORDS = [
   // 核心产品词 — PWA 系列优先 (用户搜索量最大)
   "PWA", "PWA 生成器", "PWA Generator", "PWA 安装页", "PWA 安装页生成器", "PWA 制作工具", "Progressive Web App",
@@ -195,12 +195,6 @@ const jsonLd = {
         "@type": "Offer",
         price: "0",
         priceCurrency: "USD",
-      },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.9",
-        ratingCount: "128",
-        bestRating: "5",
       },
       featureList: [
         "PWA 安装页生成",
