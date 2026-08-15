@@ -58,14 +58,12 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
     languages: {
       "zh-CN": SITE_URL,
-      "en-US": SITE_URL,
       "x-default": SITE_URL,
     },
   },
   openGraph: {
     type: "website",
     locale: "zh_CN",
-    alternateLocale: ["en_US"],
     url: SITE_URL,
     siteName: SITE_NAME,
     title: TITLE,

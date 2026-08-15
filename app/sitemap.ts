@@ -24,7 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       alternates: {
         languages: {
           'zh-CN': SITE_URL,
-          'en-US': SITE_URL,
+          'x-default': SITE_URL,
         },
       },
     },
